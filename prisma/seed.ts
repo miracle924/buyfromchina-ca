@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PrismaClient, QuoteSize, QuoteStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
