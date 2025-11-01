@@ -104,8 +104,8 @@ export default function HomePage() {
           <div className="relative flex-1">
             <div className="relative mx-auto max-w-xl overflow-hidden rounded-3xl border border-white/60 shadow-2xl">
               <Image
-                src="/images/home/hero.jpg"
-                alt="Canadian shopper reviewing Taobao finds"
+                src="/images/home/taobao.png"
+                alt="BuyFromChina shipment illustration"
                 width={960}
                 height={640}
                 className="h-full w-full object-cover"
