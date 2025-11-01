@@ -18,29 +18,53 @@ type QuoteEditable = {
 
 const initialState: QuoteUpdateState = {};
 
+const toNumber = (value: string): number => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const toCurrencyString = (value: number): string => (Math.round(value * 100) / 100).toFixed(2);
+
+const toInputString = (value: number): string => (Number.isFinite(value) ? value.toString() : '0');
+
 export function QuoteEditForm({ quote }: { quote: QuoteEditable }) {
   const [state, formAction] = useFormState(updateQuote, initialState);
   const [isPending, startTransition] = useTransition();
-  const [itemCost, setItemCost] = useState<number>(quote.itemCostCad);
-  const [serviceFee, setServiceFee] = useState<number>(quote.serviceFeeCad);
-  const [shipping, setShipping] = useState<number>(quote.shippingCad);
-  const [tax, setTax] = useState<number>(quote.taxCad);
-  const [total, setTotal] = useState<number>(quote.totalCad);
+  const [itemCost, setItemCost] = useState<string>(toInputString(quote.itemCostCad));
+  const [serviceFee, setServiceFee] = useState<string>(toCurrencyString(quote.serviceFeeCad));
+  const [shipping, setShipping] = useState<string>(toInputString(quote.shippingCad));
+  const [tax, setTax] = useState<string>(toCurrencyString(quote.taxCad));
+  const [total, setTotal] = useState<string>(toCurrencyString(quote.totalCad));
 
   useEffect(() => {
-    const calculatedServiceFee = Math.round(itemCost * 0.15 * 100) / 100;
-    setServiceFee(calculatedServiceFee);
+    const nextServiceFee = toCurrencyString(toNumber(itemCost) * 0.15);
+    if (nextServiceFee !== serviceFee) {
+      setServiceFee(nextServiceFee);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemCost]);
 
   useEffect(() => {
-    const taxableAmount = itemCost + serviceFee + shipping;
-    const calculatedTax = Math.round(taxableAmount * 0.13 * 100) / 100;
-    setTax(calculatedTax);
+    const cost = toNumber(itemCost);
+    const fee = toNumber(serviceFee);
+    const shippingAmount = toNumber(shipping);
+    const nextTax = toCurrencyString((cost + fee + shippingAmount) * 0.13);
+    if (nextTax !== tax) {
+      setTax(nextTax);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemCost, serviceFee, shipping]);
 
   useEffect(() => {
-    const newTotal = Math.round((itemCost + serviceFee + shipping + tax) * 100) / 100;
-    setTotal(newTotal);
+    const cost = toNumber(itemCost);
+    const fee = toNumber(serviceFee);
+    const shippingAmount = toNumber(shipping);
+    const taxAmount = toNumber(tax);
+    const nextTotal = toCurrencyString(cost + fee + shippingAmount + taxAmount);
+    if (nextTotal !== total) {
+      setTotal(nextTotal);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemCost, serviceFee, shipping, tax]);
 
   return (
@@ -59,7 +83,7 @@ export function QuoteEditForm({ quote }: { quote: QuoteEditable }) {
           <input
             name="itemCostCad"
             value={itemCost}
-            onChange={(event) => setItemCost(Number(event.target.value) || 0)}
+            onChange={(event) => setItemCost(event.target.value)}
             type="number"
             step="0.01"
             min="0"
@@ -83,7 +107,7 @@ export function QuoteEditForm({ quote }: { quote: QuoteEditable }) {
           <input
             name="shippingCad"
             value={shipping}
-            onChange={(event) => setShipping(Number(event.target.value) || 0)}
+            onChange={(event) => setShipping(event.target.value)}
             type="number"
             step="0.01"
             min="0"
