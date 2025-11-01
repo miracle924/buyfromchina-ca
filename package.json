@@ -6,6 +6,7 @@
     "dev": "next dev",
     "prebuild": "prisma generate",
     "build": "next build",
+    "postbuild": "node scripts/ensure-admin-manifest.js",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
