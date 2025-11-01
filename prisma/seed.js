@@ -1,7 +1,9 @@
-// @ts-nocheck
-import { PrismaClient, QuoteSize, QuoteStatus } from '@prisma/client';
+/* eslint-disable no-console */
+const { PrismaClient, QuoteSize, QuoteStatus } = require('@prisma/client');
 
 const prisma = new PrismaClient();
+
+const PRICING_VERSION = '2024-10-28';
 
 async function main() {
   const existing = await prisma.quote.findFirst({
@@ -38,8 +40,6 @@ async function main() {
 
   console.info('Seed data inserted.');
 }
-
-const PRICING_VERSION = '2024-10-28';
 
 main()
   .catch((error) => {
