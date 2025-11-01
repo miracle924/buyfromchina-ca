@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Quote" ALTER COLUMN "productURL" DROP NOT NULL;

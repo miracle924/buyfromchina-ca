@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum QuoteSize {
+  SMALL
+  MEDIUM
+  LARGE
+}
+
+enum QuoteStatus {
+  NEW
+  SENT
+  APPROVED
+  PAID
+  CANCELLED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+}
+
+model Quote {
+  id             String      @id @default(cuid())
+  createdAt      DateTime    @default(now())
+  email          String
+  recipientName  String      @default("")
+  addressLine1   String      @default("")
+  addressLine2   String?
+  city           String      @default("")
+  province       String      @default("")
+  productURL     String?
+  postalCode     String
+  notes          String?
+  size           QuoteSize
+  referencePrice Decimal?    @db.Decimal(10, 2)
+  itemCostCad    Decimal     @db.Decimal(10, 2)
+  serviceFeeCad  Decimal     @db.Decimal(10, 2)
+  shippingCad    Decimal     @db.Decimal(10, 2)
+  taxCad         Decimal     @db.Decimal(10, 2)
+  totalCad       Decimal     @db.Decimal(10, 2)
+  pricingVersion String
+  attachments    String[]     @default([])
+  status         QuoteStatus @default(NEW)
+  order          Order?
+  audits         QuoteAudit[]
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  createdAt       DateTime    @default(now())
+  quoteId         String      @unique
+  quote           Quote       @relation(fields: [quoteId], references: [id])
+  stripeSessionId String      @unique
+  stripePaymentId String?
+  email           String
+  totalCad        Decimal     @db.Decimal(10, 2)
+  status          OrderStatus @default(PENDING)
+
+  @@index([email])
+  @@index([status])
+}
+
+model QuoteAudit {
+  id         String   @id @default(cuid())
+  quoteId    String
+  quote      Quote    @relation(fields: [quoteId], references: [id])
+  createdAt  DateTime @default(now())
+  actorEmail String
+  changes    Json
+}
