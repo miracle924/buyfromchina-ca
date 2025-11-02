@@ -98,7 +98,7 @@ The app will be available at [http://localhost:3000](http://localhost:3000).
 - `pnpm prisma:migrate` – Run migrations (`prisma migrate dev`).
 - `pnpm prisma:generate` – Generate Prisma client.
 - `pnpm prisma:studio` – Launch Prisma Studio.
-- `pnpm seed` – Execute `prisma/seed.ts`.
+- `pnpm seed` – Execute `prisma/seed.js`.
 
 ## Testing & Verification
 
