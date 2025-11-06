@@ -5,6 +5,7 @@ import { PropsWithChildren } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { headers } from 'next/headers';
+import { Facebook, Instagram, Twitter } from 'lucide-react';
 import '@/app/globals.css';
 import { siteUrl } from '@/env';
 import { Providers } from '@/components/providers';
@@ -89,7 +90,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
                 <footer className="border-t border-gray-200 bg-gray-50">
                   <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                     <p>&copy; {new Date().getFullYear()} BuyFromChina.ca. All rights reserved.</p>
-                    <div className="flex gap-4">
+                    <div className="flex items-center gap-4">
                       <a href="/legal/terms" className="hover:text-primary hover:underline">
                         Terms
                       </a>
@@ -98,6 +99,35 @@ export default function RootLayout({ children }: PropsWithChildren) {
                       </a>
                       <a href="/contact" className="hover:text-primary">
                         Support
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <a
+                        href="https://www.facebook.com/share/16VPYhb4CT/?mibextid=wwXIfr"
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label="Visit our Facebook page"
+                        className="rounded-full border border-transparent p-2 text-gray-500 transition hover:border-primary/30 hover:text-primary"
+                      >
+                        <Facebook className="h-4 w-4" aria-hidden />
+                      </a>
+                      <a
+                        href="https://www.instagram.com/buyfromchina.ca?igsh=bnpvYWZraXFrZ2Fn&utm_source=qr"
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label="Visit our Instagram profile"
+                        className="rounded-full border border-transparent p-2 text-gray-500 transition hover:border-primary/30 hover:text-primary"
+                      >
+                        <Instagram className="h-4 w-4" aria-hidden />
+                      </a>
+                      <a
+                        href="https://x.com/wzy924?s=21"
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label="Visit our Twitter profile"
+                        className="rounded-full border border-transparent p-2 text-gray-500 transition hover:border-primary/30 hover:text-primary"
+                      >
+                        <Twitter className="h-4 w-4" aria-hidden />
                       </a>
                     </div>
                   </div>

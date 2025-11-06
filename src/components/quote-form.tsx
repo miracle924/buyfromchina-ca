@@ -87,14 +87,22 @@ export function QuoteForm() {
   const [state, formAction] = useFormState(createQuote, initialState);
   const [isPending, startTransition] = useTransition();
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [productUrls, setProductUrls] = useState<string[]>(['']);
   const formRef = useRef<HTMLFormElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const attachmentInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const attachmentIdRef = useRef(0);
+  const getNextAttachmentId = () => {
+    attachmentIdRef.current += 1;
+    return `attachment-${attachmentIdRef.current}`;
+  };
+  const [attachmentFields, setAttachmentFields] = useState<string[]>(() => [getNextAttachmentId()]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    setValue
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -124,9 +132,15 @@ export function QuoteForm() {
         postalCode: ''
       });
       setStatusMessage('Request received! We will email a quote soon.');
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      setProductUrls(['']);
+      Object.values(attachmentInputRefs.current).forEach((input) => {
+        if (input) {
+          input.value = '';
+        }
+      });
+      attachmentInputRefs.current = {};
+      attachmentIdRef.current += 1;
+      setAttachmentFields([`attachment-${attachmentIdRef.current}`]);
     } else if (state.error) {
       setStatusMessage(state.error);
     }
@@ -144,6 +158,50 @@ export function QuoteForm() {
   });
 
   const fieldError = (name: keyof FormValues) => errors[name]?.message ?? state.fieldErrors?.[name as string];
+  const productUrlsValue = productUrls.map((url) => url.trim()).filter(Boolean).join('\n');
+
+  useEffect(() => {
+    setValue('productURLs', productUrlsValue, {
+      shouldDirty: productUrlsValue.length > 0,
+      shouldValidate: true
+    });
+  }, [productUrlsValue, setValue]);
+
+  const updateProductUrl = (index: number, value: string) => {
+    setProductUrls((prev) => prev.map((url, idx) => (idx === index ? value : url)));
+  };
+
+  const addProductUrlField = () => {
+    setProductUrls((prev) => [...prev, '']);
+  };
+
+  const removeProductUrlField = (index: number) => {
+    setProductUrls((prev) => {
+      if (prev.length === 1) {
+        return [''];
+      }
+      return prev.filter((_, idx) => idx !== index);
+    });
+  };
+
+  const addAttachmentField = () => {
+    setAttachmentFields((prev) => [...prev, getNextAttachmentId()]);
+  };
+
+  const removeAttachmentField = (id: string) => {
+    setAttachmentFields((prev) => {
+      if (prev.length === 1) {
+        return prev;
+      }
+      const next = prev.filter((fieldId) => fieldId !== id);
+      const input = attachmentInputRefs.current[id];
+      if (input) {
+        input.value = '';
+      }
+      delete attachmentInputRefs.current[id];
+      return next;
+    });
+  };
 
   return (
     <div>
@@ -157,17 +215,48 @@ export function QuoteForm() {
         className="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-xl"
       >
         <div>
-          <label htmlFor="productURLs" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="productURLs-0" className="block text-sm font-medium text-gray-700">
             Taobao / Tmall product URLs <span className="text-gray-400">(optional)</span>
           </label>
-          <textarea
-            id="productURLs"
-            rows={3}
-            {...register('productURLs')}
-            className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-            placeholder={`https://item.taobao.com/item.htm?id=...\nhttps://detail.tmall.com/item.htm?...`}
-          />
-          <p className="mt-1 text-xs text-gray-500">Enter one product link per line if you need multiple items.</p>
+          <div className="mt-2 flex flex-col gap-3">
+            {productUrls.map((url, index) => (
+              <div key={`product-url-${index}`} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <input
+                  id={`productURLs-${index}`}
+                  type="url"
+                  inputMode="url"
+                  value={url}
+                  onChange={(event) => updateProductUrl(index, event.target.value)}
+                  placeholder="https://item.taobao.com/item.htm?id=..."
+                  className="w-full flex-1 rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+                <div className="flex items-center gap-2">
+                  {index === productUrls.length - 1 && (
+                    <button
+                      type="button"
+                      onClick={addProductUrlField}
+                      className="btn-secondary whitespace-nowrap px-4 py-2 text-sm"
+                    >
+                      Add URL
+                    </button>
+                  )}
+                  {productUrls.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeProductUrlField(index)}
+                      className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:border-red-500 hover:text-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          <input type="hidden" value={productUrlsValue} {...register('productURLs')} />
+          <p className="mt-1 text-xs text-gray-500">
+            Enter one link per field. Click “Add URL” to include more Taobao or Tmall products.
+          </p>
           {fieldError('productURLs') && <p className="mt-1 text-sm text-red-600">{fieldError('productURLs')}</p>}
         </div>
 
@@ -286,19 +375,52 @@ export function QuoteForm() {
       </div>
 
         <div>
-          <label htmlFor="attachments" className="block text-sm font-medium text-gray-700">
+          <label htmlFor={attachmentFields[0] ?? 'attachments'} className="block text-sm font-medium text-gray-700">
             Reference images <span className="text-gray-400">(optional)</span>
           </label>
-          <input
-            id="attachments"
-            name="attachments"
-            ref={fileInputRef}
-            type="file"
-            accept="image/png,image/jpeg"
-            multiple
-            className="mt-2 block w-full cursor-pointer text-sm text-gray-600 file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-primary/90"
-          />
-          <p className="mt-1 text-xs text-gray-500">Up to 5 PNG or JPEG images, max 15MB each.</p>
+          <div className="mt-2 flex flex-col gap-3">
+            {attachmentFields.map((id, index) => (
+              <div key={id} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <input
+                  id={id}
+                  name="attachments"
+                  type="file"
+                  accept="image/png,image/jpeg"
+                  ref={(element) => {
+                    if (element) {
+                      attachmentInputRefs.current[id] = element;
+                    } else {
+                      delete attachmentInputRefs.current[id];
+                    }
+                  }}
+                  className="w-full flex-1 cursor-pointer text-sm text-gray-600 file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-primary/90"
+                />
+                <div className="flex items-center gap-2">
+                  {index === attachmentFields.length - 1 && attachmentFields.length < 5 && (
+                    <button
+                      type="button"
+                      onClick={addAttachmentField}
+                      className="btn-secondary whitespace-nowrap px-4 py-2 text-sm"
+                    >
+                      Add image
+                    </button>
+                  )}
+                  {attachmentFields.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeAttachmentField(id)}
+                      className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:border-red-500 hover:text-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-1 text-xs text-gray-500">
+            Upload up to 5 PNG or JPEG images. Use “Add image” to attach another photo.
+          </p>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">

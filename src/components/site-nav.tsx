@@ -12,6 +12,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { href: '/quote', label: 'Request a Quote', variant: 'primary' },
+  { href: '/about', label: 'About' },
   { href: '/faq', label: 'FAQ' },
   { href: '/contact', label: 'Contact' },
   { href: '/admin/quotes', label: 'Admin', variant: 'ghost' }
