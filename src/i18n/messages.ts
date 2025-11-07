@@ -118,6 +118,10 @@ export const messages = {
       founderHeading: 'Meet our Founder',
       founderBio:
         'I’m Amelia, founder of BuyFromChina.ca, a platform that makes it easy for Canadians to shop trusted products directly from China. After living in Canada for over a decade, I created this service to simplify cross-border shopping and share the creativity and quality of Chinese brands with more people.',
+      founderLinkedIn: {
+        label: 'Connect on LinkedIn',
+        href: 'https://www.linkedin.com/in/ameliawang/'
+      },
       driverTitle: 'What drives us',
       driverBody:
         'We believe Canadian buyers deserve the same access to China’s makers as local shoppers. Our role is to remove uncertainty—whether that’s opaque pricing, payments that bounce, or packages that get stuck at the border—so every order feels effortless.',
@@ -596,6 +600,10 @@ export const messages = {
       founderHeading: 'Rencontrez notre fondatrice',
       founderBio:
         'Je suis Amelia, fondatrice de BuyFromChina.ca. Après plus de dix ans au Canada, j’ai lancé ce service pour simplifier les achats transfrontaliers et partager la créativité des marques chinoises.',
+      founderLinkedIn: {
+        label: 'Suivez-nous sur LinkedIn',
+        href: 'https://www.linkedin.com/in/ameliawang/'
+      },
       driverTitle: 'Notre motivation',
       driverBody:
         'Nous pensons que les acheteurs canadiens méritent le même accès aux créateurs chinois que les clients locaux. Notre rôle est d’éliminer les incertitudes — prix opaques, paiements refusés, colis bloqués — afin que chaque commande soit sereine.',
@@ -1042,6 +1050,10 @@ export const messages = {
       heroBody: '我们打通语言、支付、物流的障碍，帮助加拿大买家无压力地获取中国好物。',
       founderHeading: '创始人介绍',
       founderBio: '我是 Amelia，在加拿大生活十余年后创立 BuyFromChina.ca，希望用更简单的方式把中国品牌的创意与品质带给更多人。',
+      founderLinkedIn: {
+        label: 'LinkedIn 主页',
+        href: 'https://www.linkedin.com/in/ameliawang/'
+      },
       driverTitle: '我们的初心',
       driverBody: '我们相信加拿大买家也应享有与本地消费者同样的选择。我们的使命是消除价格不透明、支付失败、包裹滞留等不确定性。',
       processTitle: '标准化流程',

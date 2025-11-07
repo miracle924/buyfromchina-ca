@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Linkedin } from 'lucide-react';
 import { useLanguage } from '@/components/language-provider';
 
 export const metadata: Metadata = {
@@ -40,6 +41,19 @@ export default function AboutPageContent() {
           />
           <div className="space-y-4 text-gray-600 max-w-2xl">
             <p>{copy.founderBio}</p>
+            {copy.founderLinkedIn ? (
+              <div className="flex justify-center">
+                <Link
+                  href={copy.founderLinkedIn.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-primary hover:text-primary"
+                >
+                  <Linkedin className="h-4 w-4" aria-hidden />
+                  <span>{copy.founderLinkedIn.label}</span>
+                </Link>
+              </div>
+            ) : null}
           </div>
           <div className="rounded-3xl border border-primary/20 bg-primary/10 p-8 text-center shadow-lg shadow-primary/10 max-w-3xl">
             <h3 className="text-xl font-semibold text-primary text-center">{copy.driverTitle}</h3>
