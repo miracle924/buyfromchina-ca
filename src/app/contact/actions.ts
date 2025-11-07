@@ -38,7 +38,7 @@ export const submitContact = async (_prev: ContactState, formData: FormData): Pr
 
   const { name, email, message } = parsed.data;
 
-  await sendEmail({
+  const delivered = await sendEmail({
     to: env.ADMIN_EMAIL,
     subject: `Contact form inquiry from ${name}`,
     html: `<p>${name} &lt;${email}&gt; sent a message:</p><blockquote>${message
@@ -46,6 +46,9 @@ export const submitContact = async (_prev: ContactState, formData: FormData): Pr
       .replace(/>/g, '&gt;')}</blockquote>`,
     text: `From: ${name} <${email}>\n\n${message}`
   });
+  if (!delivered) {
+    return { error: copy.errors.deliveryFailed };
+  }
 
   return { success: true };
 };

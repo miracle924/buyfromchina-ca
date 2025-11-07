@@ -267,7 +267,8 @@ export const messages = {
         messageMin: 'Tell us how we can help (at least 10 characters).',
         messageMax: 'Message is too long.',
         rateLimited: 'Too many messages. Please wait a minute and try again.',
-        fixFields: 'Please fix the highlighted fields.'
+        fixFields: 'Please fix the highlighted fields.',
+        deliveryFailed: 'We could not send your message. Please try again later or email support@buyfromchina.ca.'
       }
     },
     quotePage: {
@@ -736,7 +737,8 @@ export const messages = {
         messageMin: 'Expliquez comment nous aider (minimum 10 caractères).',
         messageMax: 'Message trop long.',
         rateLimited: 'Trop de messages. Patientez une minute avant de réessayer.',
-        fixFields: 'Corrigez les champs signalés.'
+        fixFields: 'Corrigez les champs signalés.',
+        deliveryFailed: 'Impossible d’envoyer votre message. Réessayez plus tard ou écrivez directement à support@buyfromchina.ca.'
       }
     },
     quotePage: {
@@ -1135,7 +1137,8 @@ export const messages = {
         messageMin: '请至少输入 10 个字符说明需求。',
         messageMax: '留言过长。',
         rateLimited: '发送过于频繁，请稍后再试。',
-        fixFields: '请修正标红字段。'
+        fixFields: '请修正标红字段。',
+        deliveryFailed: '暂时无法发送消息，请稍后再试或直接联系 support@buyfromchina.ca。'
       }
     },
     quotePage: {
