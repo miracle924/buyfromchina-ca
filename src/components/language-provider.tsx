@@ -21,10 +21,10 @@ export function LanguageProvider({ children, initialLocale = defaultLocale }: { 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const stored = window.localStorage.getItem(STORAGE_KEY) as Locale | null;
-    if (stored && messages[stored] && stored !== locale) {
-      setLocaleState(stored);
+    if (stored && messages[stored]) {
+      setLocaleState((current) => (current === stored ? current : stored));
     }
-  }, [locale]);
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
