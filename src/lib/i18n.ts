@@ -1,7 +1,6 @@
 import { cookies, headers } from 'next/headers';
 import { defaultLocale, locales, messages, type Locale } from '@/i18n/messages';
-
-export const LOCALE_COOKIE = 'buyfromchina-locale';
+import { LOCALE_COOKIE } from '@/lib/locale';
 
 const isSupportedLocale = (value: string | undefined): value is Locale =>
   Boolean(value && locales.some((locale) => locale.code === value));

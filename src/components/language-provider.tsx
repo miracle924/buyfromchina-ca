@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { defaultLocale, locales, messages, type Locale } from '@/i18n/messages';
-import { LOCALE_COOKIE } from '@/lib/i18n';
+import { LOCALE_COOKIE } from '@/lib/locale';
 
 type LanguageContextValue = {
   locale: Locale;
