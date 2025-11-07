@@ -756,7 +756,7 @@ export const messages = {
       ]
     },
     quoteForm: {
-      urlsLabel: 'Liens produits Taobao / Tmall',
+      urlsLabel: 'Liens produits',
       optionalHint: '(optionnel)',
       addUrl: 'Ajouter un lien',
       remove: 'Supprimer',
@@ -1148,7 +1148,7 @@ export const messages = {
       ]
     },
     quoteForm: {
-      urlsLabel: '淘宝 / 天猫商品链接',
+      urlsLabel: '商品链接',
       optionalHint: '（可选）',
       addUrl: '添加链接',
       remove: '删除',
