@@ -15,6 +15,7 @@ import { env } from '@/env';
 import { randomUUID } from 'node:crypto';
 import type { QuoteFormState, QuoteSummary } from '@/types/quote';
 import { normalizeProductUrlInput, joinProductUrlsForStorage, splitProductUrls } from '@/lib/product-urls';
+import { getDictionary } from '@/lib/i18n';
 
 const isValidUrl = (value: string): boolean => {
   try {
@@ -29,59 +30,6 @@ const MAX_ATTACHMENTS = 5;
 const MAX_ATTACHMENT_SIZE_BYTES = 15 * 1024 * 1024;
 const ALLOWED_ATTACHMENT_TYPES = ['image/png', 'image/jpeg'];
 const ALLOWED_ATTACHMENT_EXTENSIONS = ['png', 'jpg', 'jpeg'];
-
-const quoteSchema = z.object({
-  productURLs: z
-    .string()
-    .transform((value) => normalizeProductUrlInput(value))
-    .refine(
-      (urls) => urls.length === 0 || urls.every((url) => isValidUrl(url)),
-      'Please enter valid Taobao/Tmall URLs separated by new lines or commas.'
-    ),
-  recipientName: z
-    .string()
-    .trim()
-    .min(2, 'Enter the recipient name.')
-    .transform((value) => value.trim()),
-  addressLine1: z
-    .string()
-    .trim()
-    .min(5, 'Enter the street address.')
-    .transform((value) => value.trim()),
-  addressLine2: z
-    .string()
-    .trim()
-    .transform((value) => (value === '' ? undefined : value))
-    .optional(),
-  city: z
-    .string()
-    .trim()
-    .min(2, 'Enter a city.')
-    .transform((value) => value.trim()),
-  province: z
-    .string()
-    .trim()
-    .min(2, 'Enter a province or territory.')
-    .transform((value) => value.trim().toUpperCase()),
-  email: z.string().email('Use a valid email address.'),
-  postalCode: z
-    .string()
-    .transform((value) => value.trim().toUpperCase())
-    .refine(
-      (value) => /^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/.test(value),
-      'Enter a valid Canadian postal code (e.g. M5V 2T6).'
-    ),
-  notes: z.string().max(1500, 'Notes must be 1500 characters or less.').optional(),
-  referencePrice: z
-    .string()
-    .optional()
-    .transform((value) => {
-      if (!value) return undefined;
-      const parsed = Number(value);
-      return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
-    }),
-  size: z.nativeEnum(QuoteSize)
-});
 
 const toSummary = (quote: {
   id: string;
@@ -134,11 +82,65 @@ const errorState = (message: string, fieldErrors?: Record<string, string>): Quot
 });
 
 export const createQuote = async (_prevState: QuoteFormState, formData: FormData): Promise<QuoteFormState> => {
+  const dictionary = getDictionary();
+  const copy = dictionary.quoteForm;
   const clientIp = headers().get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'anonymous';
 
   if (!rateLimiter.consume(`quote:${clientIp}`)) {
-    return errorState('Too many quote attempts. Please wait a minute and try again.');
+    return errorState(copy.server.rateLimited);
   }
+
+  const quoteSchema = z.object({
+    productURLs: z
+      .string()
+      .transform((value) => normalizeProductUrlInput(value))
+      .refine(
+        (urls) => urls.length === 0 || urls.every((url) => isValidUrl(url)),
+        copy.zod.urlsInvalid
+      ),
+    recipientName: z
+      .string()
+      .trim()
+      .min(2, copy.zod.recipientName)
+      .transform((value) => value.trim()),
+    addressLine1: z
+      .string()
+      .trim()
+      .min(5, copy.zod.addressLine1)
+      .transform((value) => value.trim()),
+    addressLine2: z
+      .string()
+      .trim()
+      .transform((value) => (value === '' ? undefined : value))
+      .optional(),
+    city: z
+      .string()
+      .trim()
+      .min(2, copy.zod.city)
+      .transform((value) => value.trim()),
+    province: z
+      .string()
+      .trim()
+      .min(2, copy.zod.province)
+      .transform((value) => value.trim().toUpperCase()),
+    email: z.string().email(copy.zod.email),
+    postalCode: z
+      .string()
+      .transform((value) => value.trim().toUpperCase())
+      .refine(
+        (value) => /^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/.test(value),
+        copy.zod.postalCode
+      ),
+    notes: z.string().max(1500, copy.zod.notes).optional(),
+    referencePrice: z
+      .string()
+      .optional()
+      .transform((value) => (value ? Number(value) : undefined))
+      .refine((value) => value === undefined || (Number.isFinite(value) && value > 0), copy.zod.referencePrice),
+    size: z.nativeEnum(QuoteSize, {
+      errorMap: () => ({ message: copy.zod.size })
+    })
+  });
 
   const entries = Array.from(formData.entries()).filter(([key, value]) => {
     if (key !== 'attachments') return true;
@@ -150,7 +152,7 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
     .filter((value): value is File => value instanceof File && value.size > 0);
 
   if (attachmentFiles.length > MAX_ATTACHMENTS) {
-    return errorState(`Upload up to ${MAX_ATTACHMENTS} reference images.`);
+    return errorState(copy.server.attachmentsExceeded);
   }
 
   const parsed = quoteSchema.safeParse(submission);
@@ -163,7 +165,7 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
       },
       {}
     );
-    return errorState('Please correct the highlighted fields.', fieldErrors);
+    return errorState(copy.status.generalError, fieldErrors);
   }
 
   const {
@@ -195,12 +197,12 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
 
   for (const file of attachmentFiles) {
     if (file.size > MAX_ATTACHMENT_SIZE_BYTES) {
-      return errorState('Each image must be 15MB or smaller.');
+      return errorState(copy.server.attachmentTooLarge);
     }
 
     const mimeType = file.type.toLowerCase();
     if (!ALLOWED_ATTACHMENT_TYPES.includes(mimeType)) {
-      return errorState('Only PNG and JPEG images are supported.');
+      return errorState(copy.server.attachmentType);
     }
 
     const originalName = file.name?.toLowerCase() ?? '';
@@ -222,7 +224,7 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
 
     if (uploadError) {
       console.error('Failed to upload quote attachment', uploadError);
-      return errorState('Uploading reference images failed. Please try again.');
+      return errorState(copy.server.uploadError);
     }
 
     uploadedPaths.push(objectPath);
@@ -287,6 +289,6 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
     }
     // eslint-disable-next-line no-console
     console.error('Failed to create quote', error);
-    return errorState('We hit a snag generating your quote. Please try again shortly.');
+    return errorState(copy.status.generalError);
   }
 };

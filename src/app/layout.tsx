@@ -8,6 +8,7 @@ import { siteUrl } from '@/env';
 import { Providers } from '@/components/providers';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
+import { detectLocale } from '@/lib/i18n';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -46,9 +47,10 @@ const jsonLd = {
 export default function RootLayout({ children }: PropsWithChildren) {
   const pathname = headers().get('next-url') ?? '';
   const inAdmin = pathname.startsWith('/admin');
+  const locale = detectLocale();
 
   return (
-    <html lang="en" className={inter.className}>
+    <html lang={locale} className={inter.className}>
       <body>
         <a
           href="#main"
@@ -56,7 +58,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
         >
           Skip to content
         </a>
-        <Providers>
+        <Providers initialLocale={locale}>
           <div className="min-h-screen bg-white">
             {inAdmin ? (
               <main id="main" className="bg-white">

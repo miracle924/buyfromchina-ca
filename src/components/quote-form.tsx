@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useTransition } from 'react';
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,6 +9,7 @@ import { createQuote } from '@/app/quote/actions';
 import type { QuoteFormState } from '@/types/quote';
 import { QUOTE_SIZES, type QuoteSizeOption } from '@/lib/types';
 import { normalizeProductUrlInput } from '@/lib/product-urls';
+import { useLanguage } from '@/components/language-provider';
 
 const quoteSizes = QUOTE_SIZES;
 
@@ -21,69 +22,100 @@ const isValidUrl = (value: string): boolean => {
   }
 };
 
-const schema = z.object({
-  productURLs: z
-    .string()
-    .transform((value) => normalizeProductUrlInput(value))
-    .refine(
-      (urls) => urls.length === 0 || urls.every((url) => isValidUrl(url)),
-      { message: 'Enter valid Taobao or Tmall URLs. Use a new line for each link.' }
-    ),
-  recipientName: z
-    .string()
-    .trim()
-    .min(2, 'Enter the recipient name.')
-    .transform((value) => value.trim()),
-  addressLine1: z
-    .string()
-    .trim()
-    .min(5, 'Enter the street address.')
-    .transform((value) => value.trim()),
-  addressLine2: z
-    .string()
-    .trim()
-    .transform((value) => (value === '' ? undefined : value))
-    .optional(),
-  city: z
-    .string()
-    .trim()
-    .min(2, 'Enter a city.')
-    .transform((value) => value.trim()),
-  province: z
-    .string()
-    .trim()
-    .min(2, 'Enter a province or territory.')
-    .transform((value) => value.trim().toUpperCase()),
-  email: z.string().email('Enter a valid email address.'),
-  postalCode: z
-    .string()
-    .min(6, 'Enter a postal code.')
-    .regex(/^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/, 'Use a valid Canadian postal code.'),
-  notes: z.string().max(1500, 'Notes must be at most 1500 characters.').optional(),
-  referencePrice: z
-    .string()
-    .optional()
-    .refine((value) => {
-      if (!value) return true;
-      const val = Number(value);
-      return Number.isFinite(val) && val > 0;
-    }, 'Reference price must be a positive number.'),
-  size: z.enum(QUOTE_SIZES, {
-    errorMap: () => ({ message: 'Select an estimated parcel size.' })
-  })
-});
-
-type FormValues = z.input<typeof schema>;
+type FormValues = {
+  productURLs: string;
+  recipientName: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  province: string;
+  email: string;
+  postalCode: string;
+  notes?: string;
+  referencePrice?: string;
+  size: QuoteSizeOption;
+};
 
 const initialState: QuoteFormState = {};
 
-const sizeLabels: Record<QuoteSizeOption, string> = {
-  SMALL: 'Small (accessories, light items)',
-  MEDIUM: 'Medium (shoes, hoodies, tech)',
-  LARGE: 'Large (jackets, bulk orders)'
-};
-
 export function QuoteForm() {
+  const { dictionary } = useLanguage();
+  const copy = dictionary.quoteForm;
+  const sizeLabels: Record<QuoteSizeOption, string> = {
+    SMALL: copy.parcelSize.small,
+    MEDIUM: copy.parcelSize.medium,
+    LARGE: copy.parcelSize.large
+  };
+  const footerCopy = dictionary.footer;
+  const schema = useMemo(
+    () =>
+      z.object({
+        productURLs: z
+          .string()
+          .transform((value) => normalizeProductUrlInput(value))
+          .refine(
+            (urls) => urls.length === 0 || urls.every((url) => isValidUrl(url)),
+            { message: copy.zod.urlsInvalid }
+          ),
+        recipientName: z
+          .string()
+          .trim()
+          .min(2, copy.zod.recipientName)
+          .transform((value) => value.trim()),
+        addressLine1: z
+          .string()
+          .trim()
+          .min(5, copy.zod.addressLine1)
+          .transform((value) => value.trim()),
+        addressLine2: z
+          .string()
+          .trim()
+          .transform((value) => (value === '' ? undefined : value))
+          .optional(),
+        city: z
+          .string()
+          .trim()
+          .min(2, copy.zod.city)
+          .transform((value) => value.trim()),
+        province: z
+          .string()
+          .trim()
+          .min(2, copy.zod.province)
+          .transform((value) => value.trim().toUpperCase()),
+        email: z.string().email(copy.zod.email),
+        postalCode: z
+          .string()
+          .transform((value) => value.trim().toUpperCase())
+          .refine((value) => /^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/.test(value), copy.zod.postalCode),
+        notes: z.string().max(1500, copy.zod.notes).optional(),
+        referencePrice: z
+          .string()
+          .optional()
+          .refine((value) => {
+            if (!value) return true;
+            const val = Number(value);
+            return Number.isFinite(val) && val > 0;
+          }, copy.zod.referencePrice),
+        size: z.enum(QUOTE_SIZES, {
+          errorMap: () => ({ message: copy.zod.size })
+        })
+      }),
+    [
+      copy.zod.addressLine1,
+      copy.zod.city,
+      copy.zod.email,
+      copy.zod.notes,
+      copy.zod.postalCode,
+      copy.zod.province,
+      copy.zod.recipientName,
+      copy.zod.referencePrice,
+      copy.zod.size,
+      copy.zod.urlsInvalid
+    ]
+  );
+  const formatAttachmentMessage = (count: number) =>
+    copy.status.successAttachments.replace('{{count}}', String(count));
+
   const [state, formAction] = useFormState(createQuote, initialState);
   const [isPending, startTransition] = useTransition();
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -131,7 +163,7 @@ export function QuoteForm() {
         email: '',
         postalCode: ''
       });
-      setStatusMessage('Request received! We will email a quote soon.');
+      setStatusMessage(copy.server.success);
       setProductUrls(['']);
       Object.values(attachmentInputRefs.current).forEach((input) => {
         if (input) {
@@ -144,10 +176,10 @@ export function QuoteForm() {
     } else if (state.error) {
       setStatusMessage(state.error);
     }
-  }, [reset, state]);
+  }, [copy.server.success, reset, state]);
 
   const onSubmit = handleSubmit((_values, event) => {
-    setStatusMessage('Submitting quote request…');
+    setStatusMessage(copy.status.submitting);
     const formElement = (event?.currentTarget ?? formRef.current) as HTMLFormElement | null;
     if (!formElement) return;
     const formData = new FormData(formElement);
@@ -216,7 +248,7 @@ export function QuoteForm() {
       >
         <div>
           <label htmlFor="productURLs-0" className="block text-sm font-medium text-gray-700">
-            Taobao / Tmall product URLs <span className="text-gray-400">(optional)</span>
+            {copy.urlsLabel} <span className="text-gray-400">{copy.optionalHint}</span>
           </label>
           <div className="mt-2 flex flex-col gap-3">
             {productUrls.map((url, index) => (
@@ -237,7 +269,7 @@ export function QuoteForm() {
                       onClick={addProductUrlField}
                       className="btn-secondary whitespace-nowrap px-4 py-2 text-sm"
                     >
-                      Add URL
+                      {copy.addUrl}
                     </button>
                   )}
                   {productUrls.length > 1 && (
@@ -246,7 +278,7 @@ export function QuoteForm() {
                       onClick={() => removeProductUrlField(index)}
                       className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:border-red-500 hover:text-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                     >
-                      Remove
+                      {copy.remove}
                     </button>
                   )}
                 </div>
@@ -254,16 +286,14 @@ export function QuoteForm() {
             ))}
           </div>
           <input type="hidden" value={productUrlsValue} {...register('productURLs')} />
-          <p className="mt-1 text-xs text-gray-500">
-            Enter one link per field. Click “Add URL” to include more Taobao or Tmall products.
-          </p>
+          <p className="mt-1 text-xs text-gray-500">{copy.urlsHint}</p>
           {fieldError('productURLs') && <p className="mt-1 text-sm text-red-600">{fieldError('productURLs')}</p>}
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <label htmlFor="recipientName" className="block text-sm font-medium text-gray-700">
-              Recipient name
+              {copy.recipientName.label}
             </label>
             <input
               id="recipientName"
@@ -271,13 +301,13 @@ export function QuoteForm() {
               autoComplete="name"
               {...register('recipientName')}
               className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              placeholder="Full name"
+              placeholder={copy.recipientName.placeholder}
             />
             {fieldError('recipientName') && <p className="mt-1 text-sm text-red-600">{fieldError('recipientName')}</p>}
           </div>
           <div className="sm:col-span-2">
             <label htmlFor="addressLine1" className="block text-sm font-medium text-gray-700">
-              Street address
+              {copy.addressLine1.label}
             </label>
             <input
               id="addressLine1"
@@ -285,13 +315,13 @@ export function QuoteForm() {
               autoComplete="address-line1"
               {...register('addressLine1')}
               className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              placeholder="123 Example Street"
+              placeholder={copy.addressLine1.placeholder}
             />
             {fieldError('addressLine1') && <p className="mt-1 text-sm text-red-600">{fieldError('addressLine1')}</p>}
           </div>
           <div className="sm:col-span-2">
             <label htmlFor="addressLine2" className="block text-sm font-medium text-gray-700">
-              Apartment, suite, etc. <span className="text-gray-400">(optional)</span>
+              {copy.addressLine2.label} <span className="text-gray-400">{copy.optionalHint}</span>
             </label>
             <input
               id="addressLine2"
@@ -299,26 +329,26 @@ export function QuoteForm() {
               autoComplete="address-line2"
               {...register('addressLine2')}
               className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              placeholder="Unit 5B"
+              placeholder={copy.addressLine2.placeholder}
             />
             {fieldError('addressLine2') && <p className="mt-1 text-sm text-red-600">{fieldError('addressLine2')}</p>}
           </div>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
+              {copy.email.label}
             </label>
             <input
               id="email"
               type="email"
               {...register('email')}
               className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              placeholder="you@email.com"
+              placeholder={copy.email.placeholder}
               />
             {fieldError('email') && <p className="mt-1 text-sm text-red-600">{fieldError('email')}</p>}
           </div>
           <div>
             <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-              City
+              {copy.city.label}
             </label>
             <input
               id="city"
@@ -326,13 +356,13 @@ export function QuoteForm() {
               autoComplete="address-level2"
               {...register('city')}
               className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              placeholder="Toronto"
+              placeholder={copy.city.placeholder}
             />
             {fieldError('city') && <p className="mt-1 text-sm text-red-600">{fieldError('city')}</p>}
           </div>
           <div>
             <label htmlFor="province" className="block text-sm font-medium text-gray-700">
-              Province / Territory
+              {copy.province.label}
             </label>
             <input
               id="province"
@@ -340,21 +370,21 @@ export function QuoteForm() {
               autoComplete="address-level1"
               {...register('province')}
               className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm uppercase focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              placeholder="ON"
+              placeholder={copy.province.placeholder}
               maxLength={30}
             />
             {fieldError('province') && <p className="mt-1 text-sm text-red-600">{fieldError('province')}</p>}
           </div>
           <div>
             <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">
-              Canadian postal code
+              {copy.postalCode.label}
             </label>
             <input
               id="postalCode"
               type="text"
               {...register('postalCode')}
               className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm uppercase tracking-wide focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              placeholder="M5V 2T6"
+              placeholder={copy.postalCode.placeholder}
               />
             {fieldError('postalCode') && <p className="mt-1 text-sm text-red-600">{fieldError('postalCode')}</p>}
           </div>
@@ -362,21 +392,21 @@ export function QuoteForm() {
 
         <div>
           <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
-            Notes <span className="text-gray-400">(optional)</span>
+            {copy.notes.label} <span className="text-gray-400">{copy.optionalHint}</span>
           </label>
           <textarea
             id="notes"
             rows={4}
             {...register('notes')}
             className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-            placeholder="Provide size preferences, reference photos, seller options, etc."
+            placeholder={copy.notes.placeholder}
         />
         {fieldError('notes') && <p className="mt-1 text-sm text-red-600">{fieldError('notes')}</p>}
       </div>
 
         <div>
           <label htmlFor={attachmentFields[0] ?? 'attachments'} className="block text-sm font-medium text-gray-700">
-            Reference images <span className="text-gray-400">(optional)</span>
+            {copy.attachments.label} <span className="text-gray-400">{copy.optionalHint}</span>
           </label>
           <div className="mt-2 flex flex-col gap-3">
             {attachmentFields.map((id, index) => (
@@ -402,7 +432,7 @@ export function QuoteForm() {
                       onClick={addAttachmentField}
                       className="btn-secondary whitespace-nowrap px-4 py-2 text-sm"
                     >
-                      Add image
+                      {copy.attachments.add}
                     </button>
                   )}
                   {attachmentFields.length > 1 && (
@@ -411,22 +441,20 @@ export function QuoteForm() {
                       onClick={() => removeAttachmentField(id)}
                       className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:border-red-500 hover:text-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                     >
-                      Remove
+                      {copy.remove}
                     </button>
                   )}
                 </div>
               </div>
             ))}
           </div>
-          <p className="mt-1 text-xs text-gray-500">
-            Upload up to 5 PNG or JPEG images. Use “Add image” to attach another photo.
-          </p>
+          <p className="mt-1 text-xs text-gray-500">{copy.attachments.hint}</p>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
             <label htmlFor="referencePrice" className="block text-sm font-medium text-gray-700">
-              Reference price in CAD (optional)
+              {copy.referencePrice.label}
             </label>
             <input
               id="referencePrice"
@@ -435,7 +463,7 @@ export function QuoteForm() {
               step="0.01"
               {...register('referencePrice')}
               className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              placeholder="e.g. 89.99"
+              placeholder={copy.referencePrice.placeholder}
             />
             {fieldError('referencePrice') && (
               <p className="mt-1 text-sm text-red-600">{fieldError('referencePrice')}</p>
@@ -443,7 +471,7 @@ export function QuoteForm() {
           </div>
           <div>
             <fieldset>
-              <legend className="block text-sm font-medium text-gray-700">Estimated parcel size</legend>
+              <legend className="block text-sm font-medium text-gray-700">{copy.parcelSize.legend}</legend>
               <div className="mt-2 space-y-3">
                 {quoteSizes.map((size) => (
                   <label
@@ -470,14 +498,14 @@ export function QuoteForm() {
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-gray-500">
-            We respond within 12 hours. By submitting, you agree to our{' '}
+            {copy.termsNotice}{' '}
             <a href="/legal/terms" className="text-primary hover:text-primary/80">
-              Terms of Service
+              {footerCopy.terms}
             </a>
             .
           </p>
           <button type="submit" className="btn-primary w-full sm:w-auto" disabled={isPending} aria-disabled={isPending}>
-            {isPending ? 'Submitting…' : 'Send request'}
+            {isPending ? copy.submit.pending : copy.submit.idle}
           </button>
         </div>
         <div aria-live="polite" className="text-sm text-gray-600">
@@ -488,10 +516,10 @@ export function QuoteForm() {
 
       {state.success && state.quote ? (
         <section aria-live="polite" className="mt-8 rounded-2xl border border-green-200 bg-green-50 p-6 text-sm text-green-900 shadow-sm">
-          <h2 className="text-base font-semibold">We received your request.</h2>
-          <p className="mt-2">Our team will review the item and email you a detailed quote shortly.</p>
+          <h2 className="text-base font-semibold">{copy.status.successTitle}</h2>
+          <p className="mt-2">{copy.status.successBody}</p>
           {state.quote.attachments.length > 0 ? (
-            <p className="mt-2">Attachment count: {state.quote.attachments.length}. We will reference these images when preparing pricing.</p>
+            <p className="mt-2">{formatAttachmentMessage(state.quote.attachments.length)}</p>
           ) : null}
         </section>
       ) : null}

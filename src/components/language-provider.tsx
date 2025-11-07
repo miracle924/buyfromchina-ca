@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { defaultLocale, locales, messages, type Locale } from '@/i18n/messages';
+import { LOCALE_COOKIE } from '@/lib/i18n';
 
 type LanguageContextValue = {
   locale: Locale;
@@ -14,26 +15,21 @@ const LanguageContext = createContext<LanguageContextValue | undefined>(undefine
 
 const STORAGE_KEY = 'buyfromchina-locale';
 
-const resolveInitialLocale = (): Locale => {
-  if (typeof window === 'undefined') {
-    return defaultLocale;
-  }
-  const stored = window.localStorage.getItem(STORAGE_KEY) as Locale | null;
-  if (stored && messages[stored]) {
-    return stored;
-  }
-  const browserLang = navigator.language.slice(0, 2);
-  const match = locales.find((item) => item.code.startsWith(browserLang));
-  return match?.code ?? defaultLocale;
-};
+export function LanguageProvider({ children, initialLocale = defaultLocale }: { children: ReactNode; initialLocale?: Locale }) {
+  const [locale, setLocaleState] = useState<Locale>(initialLocale);
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(resolveInitialLocale);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const stored = window.localStorage.getItem(STORAGE_KEY) as Locale | null;
+    if (stored && messages[stored] && stored !== locale) {
+      setLocaleState(stored);
+    }
+  }, [locale]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     window.localStorage.setItem(STORAGE_KEY, locale);
-    document.cookie = `${STORAGE_KEY}=${locale}; path=/; max-age=${60 * 60 * 24 * 365}`;
+    document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=${60 * 60 * 24 * 365}`;
   }, [locale]);
 
   const value = useMemo<LanguageContextValue>(

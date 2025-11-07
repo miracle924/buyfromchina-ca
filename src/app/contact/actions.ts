@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { rateLimiter } from '@/lib/rate-limit';
 import { sendEmail } from '@/lib/email';
 import { env } from '@/env';
+import { getDictionary } from '@/lib/i18n';
 
 type ContactState = {
   success?: boolean;
@@ -12,16 +13,17 @@ type ContactState = {
   fieldErrors?: Record<string, string>;
 };
 
-const schema = z.object({
-  name: z.string().min(2, 'Please enter your name.').max(80, 'Name must be under 80 characters.'),
-  email: z.string().email('Enter a valid email address.'),
-  message: z.string().min(10, 'Tell us how we can help (at least 10 characters).').max(2000)
-});
-
 export const submitContact = async (_prev: ContactState, formData: FormData): Promise<ContactState> => {
+  const dictionary = getDictionary();
+  const copy = dictionary.contactForm;
+  const schema = z.object({
+    name: z.string().min(2, copy.errors.nameRequired).max(80, copy.errors.nameMax),
+    email: z.string().email(copy.errors.emailInvalid),
+    message: z.string().min(10, copy.errors.messageMin).max(2000, copy.errors.messageMax)
+  });
   const ip = headers().get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'anonymous';
   if (!rateLimiter.consume(`contact:${ip}`)) {
-    return { error: 'Too many messages. Please wait a minute and try again.' };
+    return { error: copy.errors.rateLimited };
   }
 
   const parsed = schema.safeParse(Object.fromEntries(formData.entries()));
@@ -31,7 +33,7 @@ export const submitContact = async (_prev: ContactState, formData: FormData): Pr
         .filter(([, value]) => value && value.length)
         .map(([key, [value]]) => [key, value])
     );
-    return { error: 'Please fix the highlighted fields.', fieldErrors };
+    return { error: copy.errors.fixFields, fieldErrors };
   }
 
   const { name, email, message } = parsed.data;

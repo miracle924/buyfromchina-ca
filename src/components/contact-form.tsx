@@ -1,23 +1,40 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useFormState } from 'react-dom';
 import { submitContact, type ContactState } from '@/app/contact/actions';
-
-const schema = z.object({
-  name: z.string().min(2, 'Please enter your name.'),
-  email: z.string().email('Enter a valid email address.'),
-  message: z.string().min(10, 'Tell us how we can help.').max(2000, 'Message is too long.')
-});
-
-type FormValues = z.infer<typeof schema>;
+import { useLanguage } from '@/components/language-provider';
 
 const initialState: ContactState = {};
 
+type FormValues = {
+  name: string;
+  email: string;
+  message: string;
+};
+
 export function ContactForm() {
+  const { dictionary } = useLanguage();
+  const copy = dictionary.contactForm;
+  const schema = useMemo(
+    () =>
+      z.object({
+        name: z
+          .string()
+          .min(2, copy.errors.nameRequired)
+          .max(80, copy.errors.nameMax),
+        email: z.string().email(copy.errors.emailInvalid),
+        message: z
+          .string()
+          .min(10, copy.errors.messageMin)
+          .max(2000, copy.errors.messageMax)
+      }),
+    [copy.errors.emailInvalid, copy.errors.messageMax, copy.errors.messageMin, copy.errors.nameMax, copy.errors.nameRequired]
+  );
+
   const [state, formAction] = useFormState(submitContact, initialState);
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<string | null>(null);
@@ -33,12 +50,12 @@ export function ContactForm() {
 
   useEffect(() => {
     if (state.success) {
-      setStatus('Thanks! Your message is on the way.');
+      setStatus(copy.status.success);
       reset();
     } else if (state.error) {
       setStatus(state.error);
     }
-  }, [reset, state]);
+  }, [copy.status.success, reset, state]);
 
   const onSubmit = handleSubmit((values) => {
     const formData = new FormData();
@@ -60,42 +77,42 @@ export function ContactForm() {
     >
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-          Name
+          {copy.labels.name}
         </label>
         <input
           id="name"
           type="text"
           {...register('name')}
           className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="Jane Doe"
+          placeholder={copy.placeholders.name}
         />
         {fieldError('name') && <p className="mt-1 text-sm text-red-600">{fieldError('name')}</p>}
       </div>
 
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Email
+          {copy.labels.email}
         </label>
         <input
           id="email"
           type="email"
           {...register('email')}
           className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="you@email.com"
+          placeholder={copy.placeholders.email}
         />
         {fieldError('email') && <p className="mt-1 text-sm text-red-600">{fieldError('email')}</p>}
       </div>
 
       <div>
         <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-          Message
+          {copy.labels.message}
         </label>
         <textarea
           id="message"
           rows={5}
           {...register('message')}
           className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="Share details about your request."
+          placeholder={copy.placeholders.message}
         />
         {fieldError('message') && <p className="mt-1 text-sm text-red-600">{fieldError('message')}</p>}
       </div>
@@ -111,7 +128,7 @@ export function ContactForm() {
       </div>
 
       <button type="submit" className="btn-primary" disabled={isPending}>
-        {isPending ? 'Sending…' : 'Send message'}
+        {isPending ? copy.button.sending : copy.button.idle}
       </button>
     </form>
   );
