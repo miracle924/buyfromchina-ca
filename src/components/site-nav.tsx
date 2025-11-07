@@ -14,13 +14,11 @@ const navItems: NavItem[] = [
   { href: '/quote', label: 'Request a Quote', variant: 'primary' },
   { href: '/about', label: 'About' },
   { href: '/faq', label: 'FAQ' },
-  { href: '/contact', label: 'Contact' },
-  { href: '/admin/quotes', label: 'Admin', variant: 'ghost' }
+  { href: '/contact', label: 'Contact' }
 ];
 
 const matchPath = (pathname: string, href: string) => {
   if (href === '/') return pathname === '/';
-  if (href === '/admin/quotes') return pathname.startsWith('/admin');
   return pathname === href || pathname.startsWith(`${href}/`);
 };
 

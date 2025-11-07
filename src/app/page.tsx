@@ -4,9 +4,9 @@ import DisclaimerBanner from '@/components/DisclaimerBanner';
 
 const steps = [
   {
-    title: 'Send us the Taobao/Tmall link',
+    title: 'Send us the product links or images',
     description:
-      'Share the item URL, size, and any notes. We validate the listing and calculate all costs in CAD.',
+      'Share Taobao/Tmall URLs or inspiration photos with sizing notes. We validate listings and calculate everything in CAD.',
     artwork: '/images/home/step-1.jpg'
   },
   {

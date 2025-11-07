@@ -100,6 +100,9 @@ export default function RootLayout({ children }: PropsWithChildren) {
                       <a href="/contact" className="hover:text-primary">
                         Support
                       </a>
+                      <a href="/admin/quotes" className="hover:text-primary">
+                        Admin
+                      </a>
                     </div>
                     <div className="flex items-center gap-3">
                       <a

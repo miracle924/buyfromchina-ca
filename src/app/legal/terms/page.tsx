@@ -33,10 +33,9 @@ export default function TermsPage() {
           </p>
           <h2 className="text-xl font-semibold text-gray-900">3. Cancellations &amp; refunds</h2>
           <p>
-            Once an order has been placed with a seller, cancellations are not guaranteed. Where the seller approves a
-            cancellation or issues a refund, we will pass the refund back to you minus any non-recoverable costs (e.g.,
-            bank fees, domestic shipping). If an item arrives damaged or materially different than described, contact us
-            within 3 days of delivery and we will work with the seller to secure a remedy.
+            BuyFromChina.ca is a purchasing agent that arranges direct shipment from Taobao/Tmall sellers. We do not
+            manufacture, own, or warrant any products. All sales are final—no cancellations, returns, or exchanges are
+            offered once payment is made.
           </p>
           <h2 className="text-xl font-semibold text-gray-900">Third-Party Products &amp; No-Return Policy</h2>
           <p>

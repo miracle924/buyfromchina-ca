@@ -11,7 +11,8 @@ export const metadata: Metadata = {
 const processSteps = [
   {
     title: 'Discover',
-    description: 'Send us the Taobao or Tmall links that caught your eye. We verify sellers, stock, and variations.'
+    description:
+      'Send us the product links or reference images that caught your eye. We verify sellers, stock, and variations.'
   },
   {
     title: 'Quote',
