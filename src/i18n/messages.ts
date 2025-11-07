@@ -120,7 +120,7 @@ export const messages = {
         'I’m Amelia, founder of BuyFromChina.ca, a platform that makes it easy for Canadians to shop trusted products directly from China. After living in Canada for over a decade, I created this service to simplify cross-border shopping and share the creativity and quality of Chinese brands with more people.',
       founderLinkedIn: {
         label: 'Connect on LinkedIn',
-        href: 'https://www.linkedin.com/in/ameliawang/'
+        href: 'https://www.linkedin.com/in/amelia-wang-a11y/'
       },
       driverTitle: 'What drives us',
       driverBody:
@@ -602,7 +602,7 @@ export const messages = {
         'Je suis Amelia, fondatrice de BuyFromChina.ca. Après plus de dix ans au Canada, j’ai lancé ce service pour simplifier les achats transfrontaliers et partager la créativité des marques chinoises.',
       founderLinkedIn: {
         label: 'Suivez-nous sur LinkedIn',
-        href: 'https://www.linkedin.com/in/ameliawang/'
+        href: 'https://www.linkedin.com/in/amelia-wang-a11y/'
       },
       driverTitle: 'Notre motivation',
       driverBody:
@@ -1052,7 +1052,7 @@ export const messages = {
       founderBio: '我是 Amelia，在加拿大生活十余年后创立 BuyFromChina.ca，希望用更简单的方式把中国品牌的创意与品质带给更多人。',
       founderLinkedIn: {
         label: 'LinkedIn 主页',
-        href: 'https://www.linkedin.com/in/ameliawang/'
+        href: 'https://www.linkedin.com/in/amelia-wang-a11y/'
       },
       driverTitle: '我们的初心',
       driverBody: '我们相信加拿大买家也应享有与本地消费者同样的选择。我们的使命是消除价格不透明、支付失败、包裹滞留等不确定性。',
