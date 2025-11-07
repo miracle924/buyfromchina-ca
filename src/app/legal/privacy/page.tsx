@@ -25,9 +25,9 @@ export default function PrivacyPage() {
             <div key={section.heading} className="space-y-3">
               <h2 className="text-xl font-semibold text-gray-900">{section.heading}</h2>
               {'intro' in section && section.intro ? <p>{section.intro}</p> : null}
-              {section.body?.map((paragraph, index) => (
-                <p key={`${section.heading}-${index}`}>{paragraph}</p>
-              ))}
+              {'body' in section && section.body
+                ? section.body.map((paragraph, index) => <p key={`${section.heading}-${index}`}>{paragraph}</p>)
+                : null}
               {section.list ? (
                 <ul className="list-disc space-y-2 pl-4">
                   {section.list.map((item, index) => (
