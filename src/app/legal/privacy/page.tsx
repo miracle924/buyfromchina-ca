@@ -28,7 +28,7 @@ export default function PrivacyPage() {
               {'body' in section && section.body
                 ? section.body.map((paragraph, index) => <p key={`${section.heading}-${index}`}>{paragraph}</p>)
                 : null}
-              {section.list ? (
+              {'list' in section && section.list ? (
                 <ul className="list-disc space-y-2 pl-4">
                   {section.list.map((item, index) => (
                     <li key={`${section.heading}-item-${index}`}>{item}</li>
