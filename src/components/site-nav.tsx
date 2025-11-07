@@ -3,19 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import { useMemo } from 'react';
+import { useLanguage } from '@/components/language-provider';
 
 type NavItem = {
   href: string;
   label: string;
   variant?: 'primary' | 'default' | 'ghost';
 };
-
-const navItems: NavItem[] = [
-  { href: '/quote', label: 'Request a Quote', variant: 'primary' },
-  { href: '/about', label: 'About' },
-  { href: '/faq', label: 'FAQ' },
-  { href: '/contact', label: 'Contact' }
-];
 
 const matchPath = (pathname: string, href: string) => {
   if (href === '/') return pathname === '/';
@@ -45,6 +40,17 @@ const linkBaseClasses =
 
 export function SiteNav() {
   const pathname = usePathname();
+  const { dictionary } = useLanguage();
+  const { nav } = dictionary;
+  const navItems = useMemo<NavItem[]>(
+    () => [
+      { href: '/quote', label: nav.quote, variant: 'primary' },
+      { href: '/about', label: nav.about },
+      { href: '/faq', label: nav.faq },
+      { href: '/contact', label: nav.contact }
+    ],
+    [nav]
+  );
 
   return (
     <nav
