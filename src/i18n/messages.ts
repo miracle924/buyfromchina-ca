@@ -287,7 +287,7 @@ export const messages = {
       ]
     },
     quoteForm: {
-      urlsLabel: 'Taobao / Tmall product URLs',
+      urlsLabel: 'Product URLs',
       optionalHint: '(optional)',
       addUrl: 'Add URL',
       remove: 'Remove',
