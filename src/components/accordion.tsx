@@ -6,7 +6,7 @@ type Item = {
   answer: string;
 };
 
-export function Accordion({ items }: { items: Item[] }) {
+export function Accordion({ items }: { items: ReadonlyArray<Item> }) {
   return (
     <div className="space-y-4" role="list">
       {items.map((item) => {
