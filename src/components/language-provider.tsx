@@ -23,14 +23,8 @@ export function LanguageProvider({ children, initialLocale = defaultLocale }: { 
     const stored = window.localStorage.getItem(STORAGE_KEY) as Locale | null;
     if (stored && messages[stored]) {
       setLocaleState((current) => (current === stored ? current : stored));
-      return;
     }
-    const browserLang = window.navigator.language.slice(0, 2).toLowerCase();
-    const match = locales.find((item) => item.code.startsWith(browserLang));
-    if (match && match.code !== locale) {
-      setLocaleState(match.code);
-    }
-  }, [locale]);
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
