@@ -36,7 +36,7 @@ export function CookieBanner() {
         <p className="text-sm text-gray-700">
           We use essential cookies to keep BuyFromChina.ca secure and reliable.{' '}
           <Link
-            href="/privacy"
+            href="/legal/privacy"
             target="_blank"
             rel="noreferrer"
             className="underline underline-offset-4 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
