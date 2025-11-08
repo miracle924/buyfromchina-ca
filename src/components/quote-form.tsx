@@ -25,10 +25,6 @@ const isValidUrl = (value: string): boolean => {
 type FormValues = {
   productURLs: string;
   recipientName: string;
-  addressLine1: string;
-  addressLine2?: string;
-  city: string;
-  province: string;
   email: string;
   postalCode: string;
   notes?: string;
@@ -62,26 +58,6 @@ export function QuoteForm() {
           .trim()
           .min(2, copy.zod.recipientName)
           .transform((value) => value.trim()),
-        addressLine1: z
-          .string()
-          .trim()
-          .min(5, copy.zod.addressLine1)
-          .transform((value) => value.trim()),
-        addressLine2: z
-          .string()
-          .trim()
-          .transform((value) => (value === '' ? undefined : value))
-          .optional(),
-        city: z
-          .string()
-          .trim()
-          .min(2, copy.zod.city)
-          .transform((value) => value.trim()),
-        province: z
-          .string()
-          .trim()
-          .min(2, copy.zod.province)
-          .transform((value) => value.trim().toUpperCase()),
         email: z.string().email(copy.zod.email),
         postalCode: z
           .string()
@@ -101,12 +77,9 @@ export function QuoteForm() {
         })
       }),
     [
-      copy.zod.addressLine1,
-      copy.zod.city,
       copy.zod.email,
       copy.zod.notes,
       copy.zod.postalCode,
-      copy.zod.province,
       copy.zod.recipientName,
       copy.zod.referencePrice,
       copy.zod.size,
@@ -141,10 +114,6 @@ export function QuoteForm() {
       size: 'MEDIUM',
       productURLs: '',
       recipientName: '',
-      addressLine1: '',
-      addressLine2: '',
-      city: '',
-      province: '',
       email: '',
       postalCode: ''
     }
@@ -156,10 +125,6 @@ export function QuoteForm() {
         size: state.quote.size,
         productURLs: '',
         recipientName: '',
-        addressLine1: '',
-        addressLine2: '',
-        city: '',
-        province: '',
         email: '',
         postalCode: ''
       });
@@ -305,34 +270,6 @@ export function QuoteForm() {
             />
             {fieldError('recipientName') && <p className="mt-1 text-sm text-red-600">{fieldError('recipientName')}</p>}
           </div>
-          <div className="sm:col-span-2">
-            <label htmlFor="addressLine1" className="block text-sm font-medium text-gray-700">
-              {copy.addressLine1.label}
-            </label>
-            <input
-              id="addressLine1"
-              type="text"
-              autoComplete="address-line1"
-              {...register('addressLine1')}
-              className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              placeholder={copy.addressLine1.placeholder}
-            />
-            {fieldError('addressLine1') && <p className="mt-1 text-sm text-red-600">{fieldError('addressLine1')}</p>}
-          </div>
-          <div className="sm:col-span-2">
-            <label htmlFor="addressLine2" className="block text-sm font-medium text-gray-700">
-              {copy.addressLine2.label} <span className="text-gray-400">{copy.optionalHint}</span>
-            </label>
-            <input
-              id="addressLine2"
-              type="text"
-              autoComplete="address-line2"
-              {...register('addressLine2')}
-              className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              placeholder={copy.addressLine2.placeholder}
-            />
-            {fieldError('addressLine2') && <p className="mt-1 text-sm text-red-600">{fieldError('addressLine2')}</p>}
-          </div>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               {copy.email.label}
@@ -343,37 +280,8 @@ export function QuoteForm() {
               {...register('email')}
               className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
               placeholder={copy.email.placeholder}
-              />
+            />
             {fieldError('email') && <p className="mt-1 text-sm text-red-600">{fieldError('email')}</p>}
-          </div>
-          <div>
-            <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-              {copy.city.label}
-            </label>
-            <input
-              id="city"
-              type="text"
-              autoComplete="address-level2"
-              {...register('city')}
-              className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              placeholder={copy.city.placeholder}
-            />
-            {fieldError('city') && <p className="mt-1 text-sm text-red-600">{fieldError('city')}</p>}
-          </div>
-          <div>
-            <label htmlFor="province" className="block text-sm font-medium text-gray-700">
-              {copy.province.label}
-            </label>
-            <input
-              id="province"
-              type="text"
-              autoComplete="address-level1"
-              {...register('province')}
-              className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm uppercase focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              placeholder={copy.province.placeholder}
-              maxLength={30}
-            />
-            {fieldError('province') && <p className="mt-1 text-sm text-red-600">{fieldError('province')}</p>}
           </div>
           <div>
             <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">

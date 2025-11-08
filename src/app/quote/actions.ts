@@ -103,26 +103,6 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
       .trim()
       .min(2, copy.zod.recipientName)
       .transform((value) => value.trim()),
-    addressLine1: z
-      .string()
-      .trim()
-      .min(5, copy.zod.addressLine1)
-      .transform((value) => value.trim()),
-    addressLine2: z
-      .string()
-      .trim()
-      .transform((value) => (value === '' ? undefined : value))
-      .optional(),
-    city: z
-      .string()
-      .trim()
-      .min(2, copy.zod.city)
-      .transform((value) => value.trim()),
-    province: z
-      .string()
-      .trim()
-      .min(2, copy.zod.province)
-      .transform((value) => value.trim().toUpperCase()),
     email: z.string().email(copy.zod.email),
     postalCode: z
       .string()
@@ -168,19 +148,7 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
     return errorState(copy.status.generalError, fieldErrors);
   }
 
-  const {
-    productURLs,
-    email,
-    recipientName,
-    addressLine1,
-    addressLine2,
-    city,
-    province,
-    postalCode,
-    notes,
-    referencePrice,
-    size
-  } = parsed.data;
+  const { productURLs, email, recipientName, postalCode, notes, referencePrice, size } = parsed.data;
   const normalizedProductURL = joinProductUrlsForStorage(productURLs);
 
   const pricing = {
@@ -240,10 +208,10 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
         id: quoteId,
         email,
         recipientName,
-        addressLine1,
-        addressLine2: addressLine2 ?? null,
-        city,
-        province,
+        addressLine1: '',
+        addressLine2: null,
+        city: '',
+        province: '',
         productURL: normalizedProductURL,
         postalCode,
         notes: notes ? sanitizeNotes(notes) : null,
