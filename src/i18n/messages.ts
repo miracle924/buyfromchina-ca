@@ -36,8 +36,8 @@ export const messages = {
       statChip: '12h',
       statDescription:
         'Quotes delivered within 12 hours. Test purchases and consolidated shipping available. Customs are handled by Taobao’s direct-shipping service.',
-      bannerTag: 'Real purchases',
-      bannerTitle: 'Curated Taobao finds, shipped to Canada with care.',
+      bannerTag: '',
+      bannerTitle: '',
       about: {
         title: 'About BuyFromChina.ca',
         body:
@@ -518,8 +518,8 @@ export const messages = {
       statChip: '12h',
       statDescription:
         'Devis envoyés en moins de 12 heures. Achats test et expéditions groupées disponibles. Les formalités douanières sont prises en charge par le service d’expédition directe de Taobao.',
-      bannerTag: 'Achats réels',
-      bannerTitle: 'Sélections Taobao, expédiées vers le Canada avec soin.',
+      bannerTag: '',
+      bannerTitle: '',
       about: {
         title: 'À propos de BuyFromChina.ca',
         body:
@@ -992,8 +992,8 @@ export const messages = {
       secondaryCta: '了解流程',
       statChip: '12h',
       statDescription: '12 小时内提供报价，可代拍样品并支持合箱发货。海关流程由淘宝直邮渠道处理。',
-      bannerTag: '真实代购',
-      bannerTitle: '精选淘宝好物，用心寄到加拿大。',
+      bannerTag: '',
+      bannerTitle: '',
       about: {
         title: '关于 BuyFromChina.ca',
         body: '我们是加拿大本地采购团队，帮助买家触达中国最大电商平台。双语买手核实卖家、整合物流，提供顺畅的一站式体验。无论是一双球鞋还是整个工作室设备，我们都悉心处理。',
