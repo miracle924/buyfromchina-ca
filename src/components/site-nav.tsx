@@ -38,7 +38,12 @@ const activeTextByVariant: Record<NonNullable<NavItem['variant']>, string> = {
 const linkBaseClasses =
   'group relative inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
 
-export function SiteNav() {
+type SiteNavProps = {
+  direction?: 'horizontal' | 'vertical';
+  onNavigate?: () => void;
+};
+
+export function SiteNav({ direction = 'horizontal', onNavigate }: SiteNavProps) {
   const pathname = usePathname();
   const { dictionary } = useLanguage();
   const { nav } = dictionary;
@@ -51,6 +56,33 @@ export function SiteNav() {
     ],
     [nav]
   );
+
+  if (direction === 'vertical') {
+    return (
+      <nav className="flex flex-col gap-2" aria-label="Primary">
+        {navItems.map(({ href, label }) => {
+          const active = matchPath(pathname ?? '/', href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={onNavigate}
+              className={clsx(
+                'flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-sm font-semibold transition',
+                active
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-gray-200 text-gray-700 hover:border-primary hover:text-primary'
+              )}
+              aria-current={active ? 'page' : undefined}
+            >
+              <span>{label}</span>
+              {active ? <span className="h-2 w-2 rounded-full bg-primary" aria-hidden /> : null}
+            </Link>
+          );
+        })}
+      </nav>
+    );
+  }
 
   return (
     <nav
