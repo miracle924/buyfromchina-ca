@@ -22,7 +22,11 @@ export const metadata: Metadata = {
   description,
   alternates: { canonical: '/' },
   icons: {
-    icon: '/favicon.png'
+    icon: [
+      { url: '/favicon.png', sizes: '512x512', type: 'image/png' }
+    ],
+    apple: '/apple-touch-icon.png',
+    shortcut: '/favicon.png'
   },
   openGraph: {
     title,
