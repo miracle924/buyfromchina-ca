@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: { canonical: '/' },
+  icons: {
+    icon: '/favicon.png'
+  },
   openGraph: {
     title,
     description,
