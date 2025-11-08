@@ -83,13 +83,12 @@ export default function HomePage() {
                 className="h-full w-full object-cover"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-tr from-black/60 via-black/10 to-transparent" />
               {home.bannerTitle ? (
-                <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <div className="absolute bottom-0 left-0 right-0 bg-white/70 p-4 text-gray-900 backdrop-blur">
                   {home.bannerTag ? (
-                    <p className="text-sm uppercase tracking-wide text-white/70">{home.bannerTag}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">{home.bannerTag}</p>
                   ) : null}
-                  <h2 className="text-2xl font-semibold">{home.bannerTitle}</h2>
+                <h2 className="text-lg font-semibold">{home.bannerTitle}</h2>
                 </div>
               ) : null}
             </div>
