@@ -35,7 +35,12 @@ export function CookieBanner() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <p className="text-sm text-gray-700">
           We use essential cookies to keep BuyFromChina.ca secure and reliable.{' '}
-          <Link href="/privacy" className="underline underline-offset-4 hover:text-gray-900">
+          <Link
+            href="/privacy"
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-4 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+          >
             Learn more
           </Link>
           .
