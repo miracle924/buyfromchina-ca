@@ -9,6 +9,7 @@ import { Providers } from '@/components/providers';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { detectLocale } from '@/lib/i18n';
+import { CookieBanner } from '@/components/cookie-banner';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
   icons: {
     icon: [
+      { url: '/favicon.ico', sizes: 'any', type: 'image/x-icon' },
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
       { url: '/favicon.png', sizes: '512x512', type: 'image/png' }
@@ -80,6 +82,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
                   {children}
                 </main>
                 <SiteFooter />
+                <CookieBanner />
               </>
             )}
           </div>
