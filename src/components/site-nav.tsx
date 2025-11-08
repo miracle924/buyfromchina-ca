@@ -49,6 +49,7 @@ export function SiteNav({ direction = 'horizontal', onNavigate }: SiteNavProps) 
   const { nav } = dictionary;
   const navItems = useMemo<NavItem[]>(
     () => [
+      { href: '/', label: nav.home, variant: 'ghost' },
       { href: '/quote', label: nav.quote, variant: 'primary' },
       { href: '/about', label: nav.about },
       { href: '/faq', label: nav.faq },

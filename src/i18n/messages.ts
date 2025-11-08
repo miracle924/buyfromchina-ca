@@ -12,6 +12,7 @@ export const messages = {
   en: {
     languageSwitcher: { label: 'Language' },
     nav: {
+      home: 'Home',
       quote: 'Request a Quote',
       about: 'About',
       faq: 'FAQ',
@@ -494,6 +495,7 @@ export const messages = {
   fr: {
     languageSwitcher: { label: 'Langue' },
     nav: {
+      home: 'Accueil',
       quote: 'Demander un devis',
       about: 'À propos',
       faq: 'FAQ',
@@ -970,6 +972,7 @@ export const messages = {
   zh: {
     languageSwitcher: { label: '语言' },
     nav: {
+      home: '首页',
       quote: '提交报价请求',
       about: '关于我们',
       faq: '常见问题',
