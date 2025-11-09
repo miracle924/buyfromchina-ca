@@ -221,9 +221,21 @@ export function QuoteForm() {
   };
 
   const handleCustomReferenceChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setCustomReference(value);
-    setValue('referencePrice', value, { shouldDirty: true, shouldValidate: true });
+    const rawValue = event.target.value;
+    if (rawValue === '') {
+      setCustomReference('');
+      setValue('referencePrice', '', { shouldDirty: true, shouldValidate: true });
+      return;
+    }
+    const numericValue = Number(rawValue);
+    if (!Number.isFinite(numericValue) || numericValue <= 0) {
+      setCustomReference(rawValue);
+      return;
+    }
+    const cappedValue = Math.min(numericValue, 250);
+    const formattedValue = String(cappedValue);
+    setCustomReference(formattedValue);
+    setValue('referencePrice', formattedValue, { shouldDirty: true, shouldValidate: true });
   };
 
   const removeAttachmentField = (id: string) => {
