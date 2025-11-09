@@ -438,6 +438,7 @@ export function QuoteForm() {
                 step="0.01"
                 value={customReference}
                 onChange={handleCustomReferenceChange}
+                onInput={handleCustomReferenceChange}
                 placeholder={copy.referencePrice.customPlaceholder}
                 className="mt-3 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
