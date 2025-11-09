@@ -311,7 +311,20 @@ export const messages = {
         add: 'Add image',
         hint: 'Upload up to 5 PNG or JPEG images. Use “Add image” to attach another photo.'
       },
-      referencePrice: { label: 'Reference price in CAD (optional)', placeholder: 'e.g. 89.99' },
+      referencePrice: {
+        label: 'Reference price in CAD (optional)',
+        placeholder: 'Select a price range',
+        hint: 'Quotes work best under $250 CAD. Choose a range or enter a custom amount.',
+        customPlaceholder: 'e.g. 89.99',
+        customLabel: 'Custom amount',
+        ranges: {
+          under50: 'Under $50 CAD',
+          fiftyToHundred: '$50 – $100 CAD',
+          hundredToOneFifty: '$100 – $150 CAD',
+          oneFiftyToTwoHundred: '$150 – $200 CAD',
+          twoHundredToTwoFifty: '$200 – $250 CAD'
+        }
+      },
       parcelSize: { legend: 'Estimated parcel size', small: 'Small (accessories, light items)', medium: 'Medium (shoes, hoodies, tech)', large: 'Large (jackets, bulk orders)' },
       termsNotice: 'We respond within 12 hours. By submitting, you agree to our',
       submit: { idle: 'Send request', pending: 'Submitting…' },
@@ -331,7 +344,7 @@ export const messages = {
         email: 'Enter a valid email address.',
         postalCode: 'Use a valid Canadian postal code.',
         notes: 'Notes must be at most 1500 characters.',
-        referencePrice: 'Reference price must be a positive number.',
+        referencePrice: 'Reference price must be a positive number up to $250 CAD.',
         size: 'Select an estimated parcel size.'
       },
       server: {
@@ -786,7 +799,20 @@ export const messages = {
         add: 'Ajouter une image',
         hint: 'Téléversez jusqu’à 5 images PNG ou JPEG. Utilisez “Ajouter une image” pour une photo supplémentaire.'
       },
-      referencePrice: { label: 'Prix de référence en CAD (optionnel)', placeholder: 'ex. 89,99' },
+      referencePrice: {
+        label: 'Prix de référence en CAD (optionnel)',
+        placeholder: 'Choisissez une fourchette',
+        hint: 'Idéalement, restez sous 250 $ CA. Sélectionnez une fourchette ou saisissez un montant.',
+        customLabel: 'Montant personnalisé',
+        customPlaceholder: 'ex. 89,99',
+        ranges: {
+          under50: 'Moins de 50 $ CA',
+          fiftyToHundred: '50 $ – 100 $ CA',
+          hundredToOneFifty: '100 $ – 150 $ CA',
+          oneFiftyToTwoHundred: '150 $ – 200 $ CA',
+          twoHundredToTwoFifty: '200 $ – 250 $ CA'
+        }
+      },
       parcelSize: {
         legend: 'Taille estimée du colis',
         small: 'Petit (accessoires, articles légers)',
@@ -811,7 +837,7 @@ export const messages = {
         email: 'Indiquez un courriel valide.',
         postalCode: 'Saisissez un code postal canadien valide.',
         notes: 'Les notes doivent contenir au plus 1500 caractères.',
-        referencePrice: 'Le prix de référence doit être un nombre positif.',
+        referencePrice: 'Le prix de référence doit être positif et ne pas dépasser 250 $ CA.',
         size: 'Sélectionnez une taille estimée.'
       },
       server: {
@@ -1184,7 +1210,20 @@ export const messages = {
         add: '添加图片',
         hint: '最多上传 5 张 PNG/JPEG，可点击“添加图片”继续。'
       },
-      referencePrice: { label: '加元参考价格（可选）', placeholder: '如 89.99' },
+      referencePrice: {
+        label: '加元参考价格（可选）',
+        placeholder: '请选择价格区间',
+        hint: '建议单件报价不超过 250 加元，可选择区间或自定义金额。',
+        customLabel: '自定义金额',
+        customPlaceholder: '例如 89.99',
+        ranges: {
+          under50: '低于 50 加元',
+          fiftyToHundred: '50 - 100 加元',
+          hundredToOneFifty: '100 - 150 加元',
+          oneFiftyToTwoHundred: '150 - 200 加元',
+          twoHundredToTwoFifty: '200 - 250 加元'
+        }
+      },
       parcelSize: {
         legend: '预计包裹尺寸',
         small: '小：配饰、轻小件',
@@ -1209,7 +1248,7 @@ export const messages = {
         email: '请输入有效邮箱。',
         postalCode: '请输入有效的加拿大邮编。',
         notes: '备注最多 1500 个字符。',
-        referencePrice: '参考价格需为正数。',
+        referencePrice: '参考价格需为正数，且不超过 250 加元。',
         size: '请选择估算尺寸。'
       },
       server: {

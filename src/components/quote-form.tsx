@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { ChangeEvent, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -43,6 +43,17 @@ export function QuoteForm() {
     LARGE: copy.parcelSize.large
   };
   const footerCopy = dictionary.footer;
+  const referenceOptions = useMemo(
+    () => [
+      { id: 'under50', label: copy.referencePrice.ranges.under50, value: 25 },
+      { id: '50-100', label: copy.referencePrice.ranges.fiftyToHundred, value: 75 },
+      { id: '100-150', label: copy.referencePrice.ranges.hundredToOneFifty, value: 125 },
+      { id: '150-200', label: copy.referencePrice.ranges.oneFiftyToTwoHundred, value: 175 },
+      { id: '200-250', label: copy.referencePrice.ranges.twoHundredToTwoFifty, value: 225 },
+      { id: 'custom', label: copy.referencePrice.customLabel, value: null }
+    ],
+    [copy.referencePrice.customLabel, copy.referencePrice.ranges]
+  );
   const schema = useMemo(
     () =>
       z.object({
@@ -70,7 +81,7 @@ export function QuoteForm() {
           .refine((value) => {
             if (!value) return true;
             const val = Number(value);
-            return Number.isFinite(val) && val > 0;
+            return Number.isFinite(val) && val > 0 && val <= 250;
           }, copy.zod.referencePrice),
         size: z.enum(QUOTE_SIZES, {
           errorMap: () => ({ message: copy.zod.size })
@@ -93,6 +104,8 @@ export function QuoteForm() {
   const [isPending, startTransition] = useTransition();
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [productUrls, setProductUrls] = useState<string[]>(['']);
+  const [referenceSelection, setReferenceSelection] = useState('');
+  const [customReference, setCustomReference] = useState('');
   const formRef = useRef<HTMLFormElement | null>(null);
   const attachmentInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const attachmentIdRef = useRef(0);
@@ -130,6 +143,8 @@ export function QuoteForm() {
       });
       setStatusMessage(copy.server.success);
       setProductUrls(['']);
+      setReferenceSelection('');
+      setCustomReference('');
       Object.values(attachmentInputRefs.current).forEach((input) => {
         if (input) {
           input.value = '';
@@ -156,6 +171,7 @@ export function QuoteForm() {
 
   const fieldError = (name: keyof FormValues) => errors[name]?.message ?? state.fieldErrors?.[name as string];
   const productUrlsValue = productUrls.map((url) => url.trim()).filter(Boolean).join('\n');
+  const isCustomReference = referenceSelection === 'custom';
 
   useEffect(() => {
     setValue('productURLs', productUrlsValue, {
@@ -183,6 +199,31 @@ export function QuoteForm() {
 
   const addAttachmentField = () => {
     setAttachmentFields((prev) => [...prev, getNextAttachmentId()]);
+  };
+
+  const handleReferenceSelection = (event: ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setReferenceSelection(value);
+    if (value === 'custom') {
+      setValue('referencePrice', customReference, { shouldDirty: true, shouldValidate: true });
+      return;
+    }
+    if (value === '') {
+      setValue('referencePrice', '', { shouldDirty: true, shouldValidate: true });
+      setCustomReference('');
+      return;
+    }
+    const option = referenceOptions.find((opt) => opt.id === value && opt.value);
+    if (option?.value) {
+      setCustomReference('');
+      setValue('referencePrice', String(option.value), { shouldDirty: true, shouldValidate: true });
+    }
+  };
+
+  const handleCustomReferenceChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setCustomReference(value);
+    setValue('referencePrice', value, { shouldDirty: true, shouldValidate: true });
   };
 
   const removeAttachmentField = (id: string) => {
@@ -361,18 +402,36 @@ export function QuoteForm() {
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
-            <label htmlFor="referencePrice" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="referencePricePreset" className="block text-sm font-medium text-gray-700">
               {copy.referencePrice.label}
             </label>
-            <input
-              id="referencePrice"
-              type="number"
-              min={1}
-              step="0.01"
-              {...register('referencePrice')}
+            <select
+              id="referencePricePreset"
+              value={referenceSelection}
+              onChange={handleReferenceSelection}
               className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              placeholder={copy.referencePrice.placeholder}
-            />
+            >
+              <option value="">{copy.referencePrice.placeholder}</option>
+              {referenceOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {isCustomReference ? (
+              <input
+                type="number"
+                min={1}
+                max={250}
+                step="0.01"
+                value={customReference}
+                onChange={handleCustomReferenceChange}
+                placeholder={copy.referencePrice.customPlaceholder}
+                className="mt-3 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+            ) : null}
+            <input type="hidden" {...register('referencePrice')} />
+            <p className="mt-2 text-xs text-gray-500">{copy.referencePrice.hint}</p>
             {fieldError('referencePrice') && (
               <p className="mt-1 text-sm text-red-600">{fieldError('referencePrice')}</p>
             )}

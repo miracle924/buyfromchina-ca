@@ -116,7 +116,10 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
       .string()
       .optional()
       .transform((value) => (value ? Number(value) : undefined))
-      .refine((value) => value === undefined || (Number.isFinite(value) && value > 0), copy.zod.referencePrice),
+      .refine(
+        (value) => value === undefined || (Number.isFinite(value) && value > 0 && value <= 250),
+        copy.zod.referencePrice
+      ),
     size: z.nativeEnum(QuoteSize, {
       errorMap: () => ({ message: copy.zod.size })
     })
