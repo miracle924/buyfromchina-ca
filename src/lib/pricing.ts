@@ -25,9 +25,6 @@ const SHIPPING_BASE: Record<QuoteSize, number> = {
 const REMOTE_POSTAL_PREFIXES = new Set(['X', 'Y']);
 const REMOTE_SHIPPING_SURCHARGE = 8.5;
 
-// Canada sales tax is collected directly by the marketplace, so we keep quotes tax-free here.
-const TAX_RATE = 0;
-
 export type PricingBreakdown = {
   itemCostCad: number;
   serviceFeeCad: number;
@@ -72,9 +69,8 @@ export const calculatePricing = ({ size, postalCode, referencePrice }: Calculate
   const itemCostCad = deriveItemCost(size, referencePrice);
   const serviceFeeCad = deriveServiceFee(size, itemCostCad);
   const shippingCad = deriveShipping(size, normalizedPostalCode);
-  const taxBase = itemCostCad + serviceFeeCad + shippingCad;
-  const taxCad = toCurrency(taxBase * TAX_RATE);
-  const totalCad = toCurrency(itemCostCad + serviceFeeCad + shippingCad + taxCad);
+  const taxCad = 0;
+  const totalCad = toCurrency(itemCostCad + serviceFeeCad + shippingCad);
 
   return {
     itemCostCad,
