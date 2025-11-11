@@ -25,7 +25,8 @@ const SHIPPING_BASE: Record<QuoteSize, number> = {
 const REMOTE_POSTAL_PREFIXES = new Set(['X', 'Y']);
 const REMOTE_SHIPPING_SURCHARGE = 8.5;
 
-const TAX_RATE = 0.1275;
+// Canada sales tax is collected directly by the marketplace, so we keep quotes tax-free here.
+const TAX_RATE = 0;
 
 export type PricingBreakdown = {
   itemCostCad: number;
