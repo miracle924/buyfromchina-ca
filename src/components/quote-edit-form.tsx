@@ -11,7 +11,6 @@ type QuoteEditable = {
   itemCostCad: number;
   serviceFeeCad: number;
   shippingCad: number;
-  taxCad: number;
   totalCad: number;
   status: string;
 };
@@ -33,7 +32,6 @@ export function QuoteEditForm({ quote }: { quote: QuoteEditable }) {
   const [itemCost, setItemCost] = useState<string>(toInputString(quote.itemCostCad));
   const [serviceFee, setServiceFee] = useState<string>(toCurrencyString(quote.serviceFeeCad));
   const [shipping, setShipping] = useState<string>(toInputString(quote.shippingCad));
-  const [tax, setTax] = useState<string>(toCurrencyString(quote.taxCad));
   const [total, setTotal] = useState<string>(toCurrencyString(quote.totalCad));
 
   useEffect(() => {
@@ -48,24 +46,12 @@ export function QuoteEditForm({ quote }: { quote: QuoteEditable }) {
     const cost = toNumber(itemCost);
     const fee = toNumber(serviceFee);
     const shippingAmount = toNumber(shipping);
-    const nextTax = toCurrencyString((cost + fee + shippingAmount) * 0.13);
-    if (nextTax !== tax) {
-      setTax(nextTax);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [itemCost, serviceFee, shipping]);
-
-  useEffect(() => {
-    const cost = toNumber(itemCost);
-    const fee = toNumber(serviceFee);
-    const shippingAmount = toNumber(shipping);
-    const taxAmount = toNumber(tax);
-    const nextTotal = toCurrencyString(cost + fee + shippingAmount + taxAmount);
+    const nextTotal = toCurrencyString(cost + fee + shippingAmount);
     if (nextTotal !== total) {
       setTotal(nextTotal);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [itemCost, serviceFee, shipping, tax]);
+  }, [itemCost, serviceFee, shipping]);
 
   return (
     <form
@@ -112,18 +98,6 @@ export function QuoteEditForm({ quote }: { quote: QuoteEditable }) {
             step="0.01"
             min="0"
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-          />
-        </label>
-        <label className="space-y-2 text-sm text-gray-700">
-          <span className="font-medium">Tax (CAD)</span>
-          <input
-            name="taxCad"
-            value={tax}
-            type="number"
-            step="0.01"
-            min="0"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-            readOnly
           />
         </label>
         <label className="space-y-2 text-sm text-gray-700 sm:col-span-2">

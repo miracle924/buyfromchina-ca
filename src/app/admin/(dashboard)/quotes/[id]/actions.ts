@@ -21,7 +21,6 @@ const updateSchema = z.object({
   itemCostCad: numberField,
   serviceFeeCad: numberField,
   shippingCad: numberField,
-  taxCad: numberField,
   totalCad: numberField,
   status: z.nativeEnum(QuoteStatus)
 });
@@ -53,7 +52,7 @@ export async function updateQuote(_prev: QuoteUpdateState, formData: FormData): 
     itemCostCad: new Prisma.Decimal(data.itemCostCad),
     serviceFeeCad: new Prisma.Decimal(data.serviceFeeCad),
     shippingCad: new Prisma.Decimal(data.shippingCad),
-    taxCad: new Prisma.Decimal(data.taxCad),
+    taxCad: new Prisma.Decimal(0),
     totalCad: new Prisma.Decimal(data.totalCad),
     status: data.status
   };

@@ -76,10 +76,6 @@ export default async function CheckoutPage({ params }: Props) {
               <dt>Shipping</dt>
               <dd>{formatCurrency(Number(quote.shippingCad))}</dd>
             </div>
-            <div className="flex justify-between rounded-lg bg-gray-50 p-3">
-              <dt>Tax</dt>
-              <dd>{formatCurrency(Number(quote.taxCad))}</dd>
-            </div>
             <div className="flex justify-between rounded-lg bg-green-50 p-3 font-semibold text-green-800 sm:col-span-2">
               <dt>Total due</dt>
               <dd>{formatCurrency(Number(quote.totalCad))}</dd>

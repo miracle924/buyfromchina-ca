@@ -46,7 +46,6 @@ export default async function QuoteDetailPage({ params }: Props) {
     itemCostCad: Number(quote.itemCostCad),
     serviceFeeCad: Number(quote.serviceFeeCad),
     shippingCad: Number(quote.shippingCad),
-    taxCad: Number(quote.taxCad),
     totalCad: Number(quote.totalCad),
     status: quote.status
   };

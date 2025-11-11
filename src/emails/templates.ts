@@ -18,7 +18,6 @@ type QuoteLike = {
   itemCostCad: Quote['itemCostCad'];
   serviceFeeCad: Quote['serviceFeeCad'];
   shippingCad: Quote['shippingCad'];
-  taxCad: Quote['taxCad'];
   totalCad: Quote['totalCad'];
   pricingVersion: Quote['pricingVersion'];
   attachments: Quote['attachments'];
@@ -39,10 +38,6 @@ const renderQuoteTable = (quote: QuoteLike) => `
       <tr>
         <td style="padding:8px 0;font-weight:600;color:#111827">Shipping:</td>
         <td style="padding:8px 0;text-align:right;color:#111827">${formatCurrency(Number(quote.shippingCad))}</td>
-      </tr>
-      <tr>
-        <td style="padding:8px 0;font-weight:600;color:#111827">Tax (13%):</td>
-        <td style="padding:8px 0;text-align:right;color:#111827">${formatCurrency(Number(quote.taxCad))}</td>
       </tr>
       <tr>
         <td style="padding:12px 0;font-weight:700;color:#E11D48;font-size:16px">Total due:</td>

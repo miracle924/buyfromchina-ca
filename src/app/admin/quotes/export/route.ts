@@ -67,7 +67,6 @@ export async function GET(request: Request) {
     'Item cost',
     'Service fee',
     'Shipping',
-    'Tax',
     'Total',
     'Attachments',
     'Created at'
@@ -87,7 +86,6 @@ export async function GET(request: Request) {
     Number(quote.itemCostCad).toFixed(2),
     Number(quote.serviceFeeCad).toFixed(2),
     Number(quote.shippingCad).toFixed(2),
-    Number(quote.taxCad).toFixed(2),
     Number(quote.totalCad).toFixed(2),
     quote.attachments.join(' '),
     quote.createdAt.toISOString()
