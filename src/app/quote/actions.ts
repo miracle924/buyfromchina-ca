@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { rateLimiter } from '@/lib/rate-limit';
 import { sanitizeNotes } from '@/lib/sanitize';
-import { PRICING_VERSION } from '@/lib/pricing';
+import { PRICING_VERSION, calculatePricing } from '@/lib/pricing';
 import { buildQuoteEmails } from '@/emails/templates';
 import { sendEmail } from '@/lib/email';
 import { supabaseAdmin } from '@/lib/supabase-admin';
@@ -154,13 +154,12 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
   const { productURLs, email, recipientName, postalCode, notes, referencePrice, size } = parsed.data;
   const normalizedProductURL = joinProductUrlsForStorage(productURLs);
 
-  const pricing = {
-    itemCostCad: 0,
-    serviceFeeCad: 0,
-    shippingCad: 0,
-    taxCad: 0,
-    totalCad: 0
-  };
+  const pricing = calculatePricing({
+    productURL: normalizedProductURL ?? '',
+    size,
+    postalCode,
+    referencePrice
+  });
 
   const quoteId = randomUUID();
   const uploadedPaths: string[] = [];
