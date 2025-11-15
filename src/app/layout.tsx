@@ -78,8 +78,9 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <Script id="reddit-pixel-base" strategy="afterInteractive">
           {`
             !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js";t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);
+            var generateRedditConversionId = function(){return (crypto && typeof crypto.randomUUID==='function') ? crypto.randomUUID() : (Date.now()+'-'+Math.round(Math.random()*1e9));};
             rdt('init','${redditPixelId}'${redditInitOptionsScript});
-            rdt('track','PageVisit');
+            rdt('track','PageVisit',{conversionId: generateRedditConversionId()});
           `}
         </Script>
       </head>
