@@ -72,6 +72,7 @@ type ConversionOptions = {
   clickId?: string | null;
   user?: ConversionUserInfo;
   metadata?: ConversionMetadata;
+  testId?: string | null;
 };
 
 export async function sendRedditConversionEvent({
@@ -79,7 +80,8 @@ export async function sendRedditConversionEvent({
   customEventName,
   clickId,
   user,
-  metadata
+  metadata,
+  testId
 }: ConversionOptions) {
   if (!CONVERSIONS_TOKEN) {
     return;
@@ -96,7 +98,8 @@ export async function sendRedditConversionEvent({
     type,
     click_id: clickId ?? undefined,
     user: buildUserMatchKeys(user),
-    metadata: buildMetadata(metadata)
+    metadata: buildMetadata(metadata),
+    test_id: testId ?? undefined
   };
 
   try {
@@ -117,7 +120,8 @@ export async function sendRedditConversionEvent({
                 click_id: eventPayload.click_id,
                 type: eventPayload.type,
                 user: eventPayload.user,
-                metadata: eventPayload.metadata
+                metadata: eventPayload.metadata,
+                test_id: eventPayload.test_id
               }
             ]
           }
