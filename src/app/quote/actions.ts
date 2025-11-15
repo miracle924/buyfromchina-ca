@@ -16,6 +16,7 @@ import { randomUUID } from 'node:crypto';
 import type { QuoteFormState, QuoteSummary } from '@/types/quote';
 import { normalizeProductUrlInput, joinProductUrlsForStorage, splitProductUrls } from '@/lib/product-urls';
 import { getDictionary } from '@/lib/i18n';
+import { sendRedditConversionEvent } from '@/lib/reddit-conversions';
 
 const isValidUrl = (value: string): boolean => {
   try {
@@ -231,6 +232,11 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
     });
 
     const templates = buildQuoteEmails({ quote: created });
+    void sendRedditConversionEvent({
+      email,
+      trackingType: 'CUSTOM',
+      customEventName: 'QuoteSubmitted'
+    });
 
     await Promise.all([
       sendEmail({
