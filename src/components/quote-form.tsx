@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,6 +10,8 @@ import type { QuoteFormState } from '@/types/quote';
 import { QUOTE_SIZES, type QuoteSizeOption } from '@/lib/types';
 import { normalizeProductUrlInput } from '@/lib/product-urls';
 import { useLanguage } from '@/components/language-provider';
+import { trackRedditEvent } from '@/lib/reddit-pixel';
+import { sha256Lower } from '@/lib/hash';
 
 const quoteSizes = QUOTE_SIZES;
 
@@ -37,6 +39,7 @@ const initialState: QuoteFormState = {};
 export function QuoteForm() {
   const { dictionary } = useLanguage();
   const copy = dictionary.quoteForm;
+  const redditPixelId = process.env.NEXT_PUBLIC_REDDIT_PIXEL_ID ?? 'a2_i02wmpl91j9v';
   const sizeLabels: Record<QuoteSizeOption, string> = {
     SMALL: copy.parcelSize.small,
     MEDIUM: copy.parcelSize.medium,
@@ -109,6 +112,7 @@ export function QuoteForm() {
   const formRef = useRef<HTMLFormElement | null>(null);
   const attachmentInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const attachmentIdRef = useRef(0);
+  const lastEmailHashRef = useRef<string | null>(null);
   const getNextAttachmentId = () => {
     attachmentIdRef.current += 1;
     return `attachment-${attachmentIdRef.current}`;
@@ -237,6 +241,39 @@ export function QuoteForm() {
     setCustomReference(formattedValue);
     setValue('referencePrice', formattedValue, { shouldDirty: true, shouldValidate: true });
   };
+
+  const sendRedditPixelEvent = useCallback(
+    async (email: string, value: number) => {
+      if (!email || typeof window === 'undefined' || !window.crypto?.subtle) {
+        return;
+      }
+      try {
+        const hashed = await sha256Lower(email);
+        if (lastEmailHashRef.current === hashed) {
+          return;
+        }
+        lastEmailHashRef.current = hashed;
+        if (typeof window.rdt === 'function') {
+          window.rdt('init', redditPixelId, { email: hashed });
+        }
+        trackRedditEvent('QuoteSubmitted', {
+          email: hashed,
+          currency: 'CAD',
+          value
+        });
+      } catch (error) {
+        console.error('Failed to hash email for Reddit Pixel', error);
+      }
+    },
+    [redditPixelId]
+  );
+
+  useEffect(() => {
+    if (state.success && state.quote?.email) {
+      const totalValue = Number(state.quote.breakdown?.totalCad ?? 0);
+      void sendRedditPixelEvent(state.quote.email, totalValue);
+    }
+  }, [sendRedditPixelEvent, state]);
 
   const removeAttachmentField = (id: string) => {
     setAttachmentFields((prev) => {

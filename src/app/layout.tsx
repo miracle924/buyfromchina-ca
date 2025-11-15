@@ -12,6 +12,18 @@ import { detectLocale } from '@/lib/i18n';
 import { CookieBanner } from '@/components/cookie-banner';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const redditPixelId = process.env.NEXT_PUBLIC_REDDIT_PIXEL_ID ?? 'a2_i02wmpl91j9v';
+const redditMatchConfig = {
+  email: process.env.NEXT_PUBLIC_REDDIT_MATCH_EMAIL,
+  phoneNumber: process.env.NEXT_PUBLIC_REDDIT_MATCH_PHONE,
+  externalId: process.env.NEXT_PUBLIC_REDDIT_MATCH_EXTERNAL_ID,
+  idfa: process.env.NEXT_PUBLIC_REDDIT_MATCH_IDFA,
+  aaid: process.env.NEXT_PUBLIC_REDDIT_MATCH_AAID
+};
+const redditInitOptions = Object.fromEntries(
+  Object.entries(redditMatchConfig).filter(([, value]) => Boolean(value))
+);
+const redditInitOptionsScript = Object.keys(redditInitOptions).length ? `, ${JSON.stringify(redditInitOptions)}` : '';
 
 const title = 'BuyFromChina.ca – China’s Best, Delivered to Canada.';
 const description =
@@ -62,6 +74,15 @@ export default function RootLayout({ children }: PropsWithChildren) {
 
   return (
     <html lang={locale} className={inter.className}>
+      <head>
+        <Script id="reddit-pixel-base" strategy="afterInteractive">
+          {`
+            !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js";t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);
+            rdt('init','${redditPixelId}'${redditInitOptionsScript});
+            rdt('track','PageVisit');
+          `}
+        </Script>
+      </head>
       <body>
         <a
           href="#main"
