@@ -17,6 +17,7 @@ export type QuoteSummary = {
   breakdown: PricingBreakdown;
   createdAt: string;
   status: QuoteStatus;
+  conversionId?: string;
 };
 
 export type QuoteFormState = {

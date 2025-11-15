@@ -161,6 +161,7 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
     postalCode,
     referencePrice
   });
+  const conversionId = randomUUID();
 
   const quoteId = randomUUID();
   const uploadedPaths: string[] = [];
@@ -233,9 +234,19 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
 
     const templates = buildQuoteEmails({ quote: created });
     void sendRedditConversionEvent({
-      email,
       trackingType: 'CUSTOM',
-      customEventName: 'QuoteSubmitted'
+      customEventName: 'QuoteSubmitted',
+      user: {
+        email,
+        ipAddress: clientIp !== 'anonymous' ? clientIp : undefined,
+        userAgent: headers().get('user-agent')
+      },
+      metadata: {
+        currency: 'CAD',
+        value: pricing.totalCad,
+        conversionId,
+        itemCount: 1
+      }
     });
 
     await Promise.all([
@@ -257,7 +268,7 @@ export const createQuote = async (_prevState: QuoteFormState, formData: FormData
 
     return {
       success: true,
-      quote: toSummary(created)
+      quote: { ...toSummary(created), conversionId }
     };
   } catch (error) {
     if (uploadedPaths.length > 0) {

@@ -243,7 +243,7 @@ export function QuoteForm() {
   };
 
   const sendRedditPixelEvent = useCallback(
-    async (email: string, value: number) => {
+    async (email: string, value: number, conversionId?: string) => {
       if (!email || typeof window === 'undefined' || !window.crypto?.subtle) {
         return;
       }
@@ -259,7 +259,8 @@ export function QuoteForm() {
         trackRedditEvent('QuoteSubmitted', {
           email: hashed,
           currency: 'CAD',
-          value
+          value,
+          conversionId
         });
       } catch (error) {
         console.error('Failed to hash email for Reddit Pixel', error);
@@ -271,7 +272,7 @@ export function QuoteForm() {
   useEffect(() => {
     if (state.success && state.quote?.email) {
       const totalValue = Number(state.quote.breakdown?.totalCad ?? 0);
-      void sendRedditPixelEvent(state.quote.email, totalValue);
+      void sendRedditPixelEvent(state.quote.email, totalValue, state.quote.conversionId);
     }
   }, [sendRedditPixelEvent, state]);
 
