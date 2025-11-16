@@ -134,6 +134,16 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
           <h2 className="text-3xl font-bold text-gray-900">{home.how.title}</h2>
           <p className="mt-3 max-w-2xl text-gray-600">{home.how.intro}</p>
+          <div className="mt-8 overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-lg">
+            <video
+              controls
+              poster="/images/home/how-it-works-poster.jpg"
+              className="aspect-video w-full"
+            >
+              <source src="/videos/how-it-works.MP4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
           <div className="mt-12 grid gap-10 md:grid-cols-2">
             {steps.map((step, index) => (
               <article key={step.title} className="group overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
